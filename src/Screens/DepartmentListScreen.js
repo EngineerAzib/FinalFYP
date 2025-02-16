@@ -1,74 +1,21 @@
 import React from 'react';
-import { View, ScrollView, SafeAreaView, StyleSheet } from 'react-native';
+import { View, ScrollView, SafeAreaView, Text, ActivityIndicator } from 'react-native';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import DepartmentStats from '../Components/DepartmentStats';
 import { EmptyState } from '../Components/EmptyState';
-import CustomMenuDrawer from '../Components/CustomMenuDrawer';
 
 import styles from '../AdminPortal_Css';
 
+import DepartmentService from '../Services/DepartmentService/DepartmentService';
 
 export const DepartmentListScreen = ({ navigation }) => {
-  const departments = [
-    {
-      id: 1,
-      name: 'Computer Science',
-      totalStudents: 120,
-      genderStats: {
-        boys: { percentage: 60, count: 72 },
-        girls: { percentage: 40, count: 48 }
-      }
-    },
-    {
-      id: 2,
-      name: 'Mechanical Engineering',
-      totalStudents: 95,
-      genderStats: {
-        boys: { percentage: 75, count: 71 },
-        girls: { percentage: 25, count: 24 }
-      }
-    },
-    {
-      id: 3,
-      name: 'Civil Engineering',
-      totalStudents: 150,
-      genderStats: {
-        boys: { percentage: 80, count: 120 },
-        girls: { percentage: 20, count: 30 }
-      }
-    },
-    {
-      id: 4,
-      name: 'Computer Science',
-      totalStudents: 120,
-      genderStats: {
-        boys: { percentage: 60, count: 72 },
-        girls: { percentage: 40, count: 48 }
-      }
-    },
-    {
-      id: 5,
-      name: 'Mechanical Engineering',
-      totalStudents: 95,
-      genderStats: {
-        boys: { percentage: 75, count: 71 },
-        girls: { percentage: 25, count: 24 }
-      }
-    },
-    {
-      id: 6,
-      name: 'Civil Engineering',
-      totalStudents: 150,
-      genderStats: {
-        boys: { percentage: 80, count: 120 },
-        girls: { percentage: 20, count: 30 }
-      }
-    },
-  ];
+  // Call DepartmentService to get data
+  const { departments, loading, error } = DepartmentService();
 
   const handleAddDepartment = () => {
     navigation.navigate('CreateDepartmentScreen');
+    console.log("Azib");
   };
 
   const handleEditDepartment = (id) => {
@@ -78,17 +25,25 @@ export const DepartmentListScreen = ({ navigation }) => {
   const handleDeleteDepartment = (id) => {
     console.log('Delete department:', id);
   };
-  const toggleCard = (id) => {
-    setExpandedCards(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.DepartmentListScreensafeArea}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.DepartmentListScreensafeArea}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>{error}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.DepartmentListScreensafeArea}>
       <Header />

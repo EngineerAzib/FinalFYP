@@ -8,51 +8,16 @@ import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import styles from '../AdminPortal_Css';
+import SemesterCourse from '../Services/CoursesService/SemesterCourse';
 
 
 
 export const SemesterCoursesScreen = ({ route }) => {
     const { department, semester } = route.params;
-    const courses = [
-      {
-        id: 1,
-        name: 'Advanced Programming',
-        creditHours: 3,
-        instructor: 'Dr. Smith',
-        code: 'CS-401'
-      },
-      {
-        id: 2,
-        name: 'Advanced Programming',
-        creditHours: 3,
-        instructor: 'Dr. Smith',
-        code: 'CS-401'
-      },
-      {
-        id: 3,
-        name: 'Advanced Programming',
-        creditHours: 3,
-        instructor: 'Dr. Smith',
-        code: 'CS-401'
-      },
-      {
-        id: 4,
-        name: 'Advanced Programming',
-        creditHours: 3,
-        instructor: 'Dr. Smith',
-        code: 'CS-401'
-      },
-      {
-        id: 5,
-        name: 'Advanced Programming',
-        creditHours: 3,
-        instructor: 'Dr. Smith',
-        code: 'CS-401'
-      },
+    console.log(department.id,"dept");
+    console.log(semester.semesterId,"sem");
 
-
-    ];
-  
+  const{course,error}=SemesterCourse({depId:department.id,semId:semester.semesterId})
     return (
       <View style={styles.SemesterCoursesScreencontainer}>
         <Header />
@@ -64,10 +29,10 @@ export const SemesterCoursesScreen = ({ route }) => {
           // navigation={navigation}
         />
         <ScrollView style={styles.SemesterCoursesScreenscrollView}>
-          {courses.map((course) => (
+          {course.map((item) => (
             <CourseCard 
-            key={course.id} 
-            course={course} 
+            key={item.id} 
+            course={item} 
             departmentName={department.name} 
             semester={semester} 
           />

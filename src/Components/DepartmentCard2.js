@@ -15,7 +15,7 @@ export const DepartmentCard2 = ({ department, onPress }) => {
         <View style={styles.DepartmentCard2textContainer}>
           <Text style={styles.DepartmentCard2departmentName}>{department.name}</Text>
           <Text style={styles.DepartmentCard2semesterCount}>
-            {department.totalSemesters} Semesters
+           8 Semesters
           </Text>
         </View>
       </View>

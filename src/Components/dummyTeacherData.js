@@ -1,4 +1,5 @@
-export const dummyTeacherData = {
+export const 
+dummyTeacherData = {
   name: "Dr. Sarah Johnson",
   registrationNo: "T2024-001",
   designation: "Associate Professor",
@@ -8,7 +9,9 @@ export const dummyTeacherData = {
 
   schedule: {
     monday: [
-      { time: "09:00 AM - 10:30 AM", department: "Computer Science", section: "A" },
+      { time: "09:00 AM - 10:30 AM",
+         department: "Computer Science", section: "A" },
+
       { time: "11:00 AM - 12:30 PM", department: "Software Engineering", section: "B" }
     ],
     tuesday: [

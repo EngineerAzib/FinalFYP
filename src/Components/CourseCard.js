@@ -31,7 +31,7 @@ export const CourseCard = ({ course, route, departmentName, semester }) => {
           <MaterialIcons name="book" size={24} color="#4A6BD6" />
         </View>
         <View style={styles.CourseCardcourseInfo}>
-          <Text style={styles.CourseCardcourseCode}>{course.code}</Text>
+          <Text style={styles.CourseCardcourseCode}>{course.initialName}</Text>
           <Text style={styles.CourseCardcourseName}>{course.name}</Text>
         </View>
         <TouchableOpacity
@@ -44,11 +44,11 @@ export const CourseCard = ({ course, route, departmentName, semester }) => {
       <View style={styles.CourseCardcourseDetails}>
         <View style={styles.CourseCarddetailItem}>
           <MaterialIcons name="access-time" size={20} color="#6B7280" />
-          <Text style={styles.CourseCarddetailText}>{course.creditHours} Credit Hours</Text>
+          <Text style={styles.CourseCarddetailText}>{course.credits} Credit Hours</Text>
         </View>
         <View style={styles.CourseCarddetailItem}>
           <MaterialIcons name="person" size={20} color="#6B7280" />
-          <Text style={styles.CourseCarddetailText}>{course.instructor}</Text>
+          <Text style={styles.CourseCarddetailText}>{course.teacherName}</Text>
         </View>
       </View>
     </View>

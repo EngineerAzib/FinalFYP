@@ -12,12 +12,11 @@ export const InternshipCard = ({ internship }) => {
   };
 
   const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case 'active':
+    switch (status) {
+      case true:
         return '#10B981'; // green
-      case 'upcoming':
-        return '#6366F1'; // indigo
-      case 'closed':
+      
+      case false:
         return '#EF4444'; // red
       default:
         return '#6B7280'; // gray
@@ -25,7 +24,7 @@ export const InternshipCard = ({ internship }) => {
   };
 
   const getDurationIcon = (duration) => {
-    if (duration.includes('month')) {
+    if (duration.includes('6 months')) {
       return 'date-range';
     } else if (duration.includes('week')) {
       return 'view-week';
@@ -42,7 +41,7 @@ export const InternshipCard = ({ internship }) => {
             <MaterialIcons name="business" size={24} color="#6C63FF" />
           </View>
           <View>
-            <Text style={styles.InternshipCardcompanyName}>{internship.company}</Text>
+            <Text style={styles.InternshipCardcompanyName}>{internship.companyName}</Text>
             <Text style={styles.InternshipCardlocation}>
               <MaterialIcons name="location-on" size={14} color="#6B7280" />
               {" " + internship.location}
@@ -67,32 +66,38 @@ export const InternshipCard = ({ internship }) => {
           </View>
           <View style={[styles.InternshipCardtag, { backgroundColor: '#EEF0FB' }]}>
             <MaterialIcons name="work" size={16} color="#6C63FF" />
-            <Text style={styles.InternshipCardtagText}>{internship.type}</Text>
+            <Text style={styles.InternshipCardtagText}>{internship.departmentTitle}</Text>
+          </View>
+          <View style={[styles.InternshipCardtag, { backgroundColor: '#EEF0FB' }]}>
+            <MaterialIcons name="work" size={16} color="#6C63FF" />
+            <Text style={styles.InternshipCardtagText}>{internship.year} Semester</Text>
           </View>
           <View style={[styles.InternshipCardtag, { backgroundColor: '#EEF0FB' }]}>
             <MaterialIcons name="payments" size={16} color="#6C63FF" />
-            <Text style={styles.InternshipCardtagText}>{internship.stipend}</Text>
+            <Text style={styles.InternshipCardtagText}>{internship.stippend}pkr</Text>
           </View>
         </View>
 
         <View style={styles.InternshipCarddetailsContainer}>
           <View style={styles.InternshipCarddetailItem}>
             <MaterialIcons name="group" size={16} color="#6B7280" />
-            <Text style={styles.InternshipCarddetailText}>{internship.positions} positions</Text>
+            <Text style={styles.InternshipCarddetailText}>{internship.position} positions</Text>
           </View>
           <View style={styles.InternshipCarddetailItem}>
             <MaterialIcons name="event" size={16} color="#6B7280" />
-            <Text style={styles.InternshipCarddetailText}>Apply by {internship.deadline}</Text>
+            <Text style={styles.InternshipCarddetailText}>Apply before {internship.applicationDeadline}</Text>
           </View>
         </View>
 
         <View style={styles.InternshipCardfooter}>
-          <View style={[styles.InternshipCardstatusTag, { backgroundColor: `${getStatusColor(internship.status)}20` }]}>
-            <View style={[styles.InternshipCardstatusDot, { backgroundColor: getStatusColor(internship.status) }]} />
-            <Text style={[styles.InternshipCardstatusText, { color: getStatusColor(internship.status) }]}>
-              {internship.status}
-            </Text>
-          </View>
+        <View style={[styles.InternshipCardstatusTag, { backgroundColor: `${getStatusColor(internship.isActive)}20` }]}>
+  <View style={[styles.InternshipCardstatusDot, { backgroundColor: getStatusColor(internship.isActive) }]} />
+  
+  <Text style={[styles.InternshipCardstatusText, { color: getStatusColor(internship.isActive) }]}>
+    {internship.isActive ? 'Active' : 'Deactive'}  {/* Conditional Text */}
+  </Text>
+</View>
+
           <Text style={styles.InternshipCardpostedDate}>Posted {internship.postedDate}</Text>
         </View>
       </View>

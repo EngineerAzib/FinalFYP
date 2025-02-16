@@ -12,50 +12,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import styles from '../AdminPortal_Css';
+import AllStudentService from '../Services/StudentService/AllStudentService';
 
 const AllStudentsScreen = ({ navigation }) => {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Mock data for demonstration
-  const mockStudents = [
-    {
-      id: 1,
-      name: 'Hshdhd',
-      department: 'Vssb',
-      profileImage: null
-    },
-    {
-      id: 2,
-      name: 'Bdbdid',
-      department: 'Ehbdbd',
-      profileImage: null
-    },
-    // Add more mock data as needed
-  ];
-
-  useEffect(() => {
-    // TODO: Replace with actual API call
-    // Example API call:
-    /*
-    const fetchStudents = async () => {
-      try {
-        const response = await fetch('your-api-endpoint/students');
-        const data = await response.json();
-        setStudents(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching students:', error);
-        setLoading(false);
-      }
-    };
-    fetchStudents();
-    */
-
-    // Using mock data for now
-    setStudents(mockStudents);
-    setLoading(false);
-  }, []);
+const{student,error}=AllStudentService();
 
   const handleAddNew = () => {
     // Navigate to add new student screen
@@ -64,10 +24,10 @@ const AllStudentsScreen = ({ navigation }) => {
 
 
 
-  const handleView = (studentId) => {
-    // Navigate to view student details screen
-    navigation.navigate('StudentProfileView', { studentId });
-  };
+  // const handleView = (studentId) => {
+  //   // Navigate to view student details screen
+  //   navigation.navigate('StudentProfileView', { studentId });
+  // };
 
   const handleDelete = async (studentId) => {
     // TODO: Implement delete functionality with API
@@ -95,9 +55,15 @@ const AllStudentsScreen = ({ navigation }) => {
         )}
       </View>
       <Text style={styles.AllStudentsScreenstudentName}>{student.name}</Text>
-      <Text style={styles.AllStudentsScreendepartmentName}>{student.department}</Text>
+      <Text style={styles.AllStudentsScreendepartmentName}>{student.endrollementNo}</Text>
+      <Text style={styles.AllStudentsScreendepartmentName}>{student.rollNo}</Text>
       <View style={styles.AllStudentsScreenactionButtons}>
-        <TouchableOpacity onPress={() => handleView(student.id)} style={styles.AllStudentsScreenactionButton}>
+      
+        <TouchableOpacity onPress={() => 
+                  navigation.navigate('StudentProfileView', {
+                    student 
+                  })
+                } style={styles.AllStudentsScreenactionButton}>
           <Ionicons name="search" size={22} color="#6B7280" />
         </TouchableOpacity>
         {/* <TouchableOpacity onPress={() => handleEdit(student.id)} style={styles.AllStudentsScreenactionButton}>
@@ -123,8 +89,8 @@ const AllStudentsScreen = ({ navigation }) => {
       <CustomHeader title="Students" currentScreen="All Students" />
       <ScrollView contentContainerStyle={styles.AllStudentsScreenscrollContent}>
         <View style={styles.AllStudentsScreencardsContainer}>
-          {students.map((student) => (
-            <StudentCard key={student.id} student={student} />
+          {student.map((item) => (
+            <StudentCard key={item.id} student={item} />
           ))}
           <AddNewCard />
         </View>

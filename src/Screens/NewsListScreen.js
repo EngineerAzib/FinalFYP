@@ -8,31 +8,10 @@ import { NewsCard } from '../Components/NewsCard';
 import { EditNewsScreen} from './EditNewsScreen';
 import { CreateNewsScreen } from './CreateNewsScreen';
 import styles from '../AdminPortal_Css';
-
+import NewsService from '../Services/NewsService/NewsService'
 export const NewsListScreen = ({ navigation }) => {
   // Sample data - replace with your API call
-  const news = [
-    {
-      id: 1,
-      title: 'New Campus Library Opening Soon',
-      content: 'We are excited to announce the grand opening of our new state-of-the-art library facility. The new building will feature modern study spaces, advanced technology resources, and an expanded collection of books and digital media.',
-      category: 'Announcement',
-      author: 'Admin Team',
-      publishDate: '2025-02-15',
-      image: null,
-      tags: ['campus', 'library', 'facilities']
-    },
-    {
-      id: 2,
-      title: 'Important Schedule Changes',
-      content: 'Due to the upcoming renovation work, there will be temporary changes to class schedules starting next week. Please check your student portal for updated information.',
-      category: 'Alert',
-      author: 'Academic Affairs',
-      publishDate: '2025-02-14',
-      image: null,
-      tags: ['schedule', 'classes', 'important']
-    }
-  ];
+ const{news,loading, error }=NewsService();
 
   return (
     <View style={styles.NewsListScreencontainer}>

@@ -7,37 +7,43 @@ import { EventCard } from '../Components/EventCard';
 import { EditEventScreen } from './EditEventScreen';
 import { CreateEventScreen } from './CreateEventScreen';
 import styles from '../AdminPortal_Css';
+import EventService from '../Services/EventService/EventService'
 
 export const EventListScreen = ({ navigation }) => {
-  // Sample data - replace with your API call
-  const events = [
-    {
-      id: 1,
-      title: 'Tech Conference 2025',
-      description: 'Annual technology conference',
-      date: '2025-03-15',
-      time: '09:00',
-      venue: 'Main Auditorium',
-      organizer: 'CS Department',
-      maxParticipants: '200',
-      registrationDeadline: '2025-03-10',
-      eventType: 'Conference',
-      image: null
-    },
-    {
-      id: 2,
-      title: 'AI Workshop',
-      description: 'Hands-on AI/ML workshop',
-      date: '2025-03-20',
-      time: '14:00',
-      venue: 'Lab 101',
-      organizer: 'AI Club',
-      maxParticipants: '50',
-      registrationDeadline: '2025-03-18',
-      eventType: 'Workshop',
-      image: null
-    }
-  ];
+  // Fetch events, error, and loading state from the EventService custom hook
+  const { event, error, loading } = EventService();
+
+  if (loading) {
+    return (
+      <View style={styles.EventListScreencontainer}>
+        <Header />
+        <CustomHeader
+          title="Events"
+          currentScreen="Events List"
+          showSearch={true}
+          showRefresh={false}
+          navigation={navigation}
+        />
+        {/* Add loading indicator or spinner here */}
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.EventListScreencontainer}>
+        <Header />
+        <CustomHeader
+          title="Events"
+          currentScreen="Events List"
+          showSearch={true}
+          showRefresh={false}
+          navigation={navigation}
+        />
+        <Text>Error loading events: {error}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.EventListScreencontainer}>
@@ -50,8 +56,9 @@ export const EventListScreen = ({ navigation }) => {
         navigation={navigation}
       />
       <ScrollView style={styles.EventListScreenscrollView}>
-        {events.map((event) => (
-          <EventCard key={event.id} event={event} />
+        {event.map((eventItem) => (
+          // Ensure event.id is unique and passed as key
+          <EventCard key={eventItem.id} event={eventItem} />
         ))}
       </ScrollView>
       <TouchableOpacity

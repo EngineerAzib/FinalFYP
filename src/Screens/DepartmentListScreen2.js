@@ -10,6 +10,8 @@ import { CourseCard } from '../Components/CourseCard';
 
 import styles from '../AdminPortal_Css';
 
+import DepartmentService from '../Services/DepartmentService/DepartmentService';
+ 
 const EnhancedCustomHeader = ({ navigation }) => (
   <View style={styles.DepartmentListScreen2enhancedHeader}>
     <CustomHeader
@@ -22,10 +24,7 @@ const EnhancedCustomHeader = ({ navigation }) => (
   </View>
 );
 export const DepartmentListScreen2 = ({ navigation }) => {
-  const departments = [
-    { id: 1, name: 'Software Engineering', totalSemesters: 8 },
-    { id: 2, name: 'Computer Science', totalSemesters: 8 },
-  ];
+  const {departments}=DepartmentService()   
 
   return (
     <View style={styles.DepartmentListScreen2container}>

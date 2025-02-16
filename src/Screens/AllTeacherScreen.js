@@ -12,10 +12,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import styles from '../AdminPortal_Css';
+import GetAllTeacher from '../Services/Teacher/GetAllTeacher.js';
 
 const AllTeachersScreen = ({ navigation }) => {
-  const [teachers, setTeachers] = useState([]);
-  const [loading, setLoading] = useState(true);
+const{teacher}=GetAllTeacher();
+console.log(teacher,"Az");
 
   // Mock data for demonstration - expanded to include teacher-specific fields
   const mockTeachers = [
@@ -37,28 +38,7 @@ const AllTeachersScreen = ({ navigation }) => {
     },
   ];
 
-  useEffect(() => {
-    // TODO: Replace with actual API call
-    // Example API call:
-    /*
-    const fetchTeachers = async () => {
-      try {
-        const response = await fetch('your-api-endpoint/teachers');
-        const data = await response.json();
-        setTeachers(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching teachers:', error);
-        setLoading(false);
-      }
-    };
-    fetchTeachers();
-    */
-
-    // Using mock data for now
-    setTeachers(mockTeachers);
-    setLoading(false);
-  }, []);
+  
 
   const handleAddNew = () => {
     // Navigate to add new teacher screen
@@ -70,6 +50,7 @@ const AllTeachersScreen = ({ navigation }) => {
   const handleView = (teacherId) => {
     // Navigate to view teacher details screen
     navigation.navigate('TeacherViewScreen', { teacherId });
+    console.log(teacherId,"Azi")
   };
 
   const handleDelete = async (teacherId) => {
@@ -131,7 +112,7 @@ const AllTeachersScreen = ({ navigation }) => {
       />
       <ScrollView contentContainerStyle={styles.AllTeacherScreenscrollContent}>
         <View style={styles.AllTeacherScreencardsContainer}>
-          {teachers.map((teacher) => (
+          {teacher.map((teacher) => (
             <TeacherCard key={teacher.id} teacher={teacher} />
           ))}
           <AddNewCard />

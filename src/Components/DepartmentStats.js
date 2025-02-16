@@ -1,12 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  Stylesheet,
-  Animated,
-  Easing,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, Animated, Easing, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import styles from '../AdminPortal_Css';
@@ -14,11 +7,13 @@ import styles from '../AdminPortal_Css';
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const AnimatedRing = ({ percentage, color, size = 80 }) => {
-  const animatedValue = React.useRef(new Animated.Value(0)).current;
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  const [formattedPercentage, setFormattedPercentage] = useState(0); // State for formatted percentage
   const radius = size * 0.4; // Making the ring proportional to container size
   const strokeWidth = size * 0.1;
 
-  React.useEffect(() => {
+  useEffect(() => {
+    setFormattedPercentage(percentage.toFixed(1)); // Set formatted percentage when percentage changes
     animatedValue.setValue(0);
     Animated.timing(animatedValue, {
       toValue: percentage,
@@ -62,11 +57,10 @@ const AnimatedRing = ({ percentage, color, size = 80 }) => {
         />
       </Svg>
       <View style={styles.DepartmentStatspercentageContainer}>
-        <Animated.Text style={[styles.DepartmentStatspercentageText, { fontSize: size * 0.2 }]}>
-          {animatedValue.interpolate({
-            inputRange: [0, 100],
-            outputRange: ['0', percentage.toString()],
-          })}%
+        <Animated.Text
+          style={[styles.DepartmentStatspercentageText, { fontSize: size * 0.2 }]}
+        >
+          {formattedPercentage}%
         </Animated.Text>
       </View>
     </View>

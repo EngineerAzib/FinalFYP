@@ -5,16 +5,51 @@ import { CustomHeader } from '../Components/CustomHeader';
 import { MaterialIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { dummyTeacherData } from '../Components/dummyTeacherData';
 import styles from '../AdminPortal_Css';
+import useTeacherById from '../Services/Teacher/useTeacherById';
+
 
 
 
 export const TeacherViewScreen = ({ route, navigation }) => {
-  const teacherData = route?.params?.teacherData || dummyTeacherData;
+  const { teacherId } = route.params; 
 
+  console.log(teacherId,"teacherId1")
+  const { teacherData, loading, error } = useTeacherById(teacherId)|| {};
+  
+      const teacher = teacherData?.teacherData; // Extract the nested "teacherData"
+
+  // const teacherData = route?.params?.teacherData || dummyTeacherData;
+console.log(teacherData,"Tec")
   // Add toggle states for each card
   const [isScheduleExpanded, setIsScheduleExpanded] = useState(true);
   const [isAttendanceExpanded, setIsAttendanceExpanded] = useState(true);
   const [isFeedbackExpanded, setIsFeedbackExpanded] = useState(true);
+  // ✅ Handle Missing `teacherData`
+  if (loading) {
+    return (
+      <View style={styles.TeacherViewScreencontainer}>
+        <Text style={{ textAlign: "center" }}>⏳ Loading Teacher Data...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.TeacherViewScreencontainer}>
+        <Text style={{ color: "red", textAlign: "center" }}>❌ Error fetching teacher data</Text>
+      </View>
+    );
+  }
+
+  if (!teacherData) {
+    return (
+      <View style={styles.TeacherViewScreencontainer}>
+        <Text style={{ color: "red", textAlign: "center" }}>❌ No Data Available for this Teacher</Text>
+      </View>
+    );
+  }
+
+  const renderValue = (value) => (value ? value : "N/A");
 
   const renderWeeklySchedule = () => {
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -86,10 +121,10 @@ export const TeacherViewScreen = ({ route, navigation }) => {
 
           <View style={styles.TeacherViewScreenbasicInfoContent}>
             <View style={styles.TeacherViewScreenprofileImageContainer}>
-              <Image
+              {/* <Image
                 source={{ uri: teacherData.profilePhoto }}
                 style={styles.TeacherViewScreenprofileImage}
-              />
+              /> */}
             </View>
 
             <View style={styles.TeacherViewScreeninfoGrid}>
@@ -97,7 +132,7 @@ export const TeacherViewScreen = ({ route, navigation }) => {
                 <Ionicons name="person" size={20} color="#6B7280" />
                 <View>
                   <Text style={styles.TeacherViewScreeninfoLabel}>Name</Text>
-                  <Text style={styles.TeacherViewScreeninfoValue}>{teacherData.name}</Text>
+                  <Text style={styles.TeacherViewScreeninfoValue}>{teacher?.name}</Text>
                 </View>
               </View>
 
@@ -105,7 +140,7 @@ export const TeacherViewScreen = ({ route, navigation }) => {
                 <MaterialIcons name="badge" size={20} color="#6B7280" />
                 <View>
                   <Text style={styles.TeacherViewScreeninfoLabel}>Registration No.</Text>
-                  <Text style={styles.TeacherViewScreeninfoValue}>{teacherData.registrationNo}</Text>
+                  <Text style={styles.TeacherViewScreeninfoValue}>{teacher?.registrationNo}</Text>
                 </View>
               </View>
 
@@ -113,7 +148,7 @@ export const TeacherViewScreen = ({ route, navigation }) => {
                 <FontAwesome5 name="user-tie" size={20} color="#6B7280" />
                 <View>
                   <Text style={styles.TeacherViewScreeninfoLabel}>Designation</Text>
-                  <Text style={styles.TeacherViewScreeninfoValue}>{teacherData.designation}</Text>
+                  <Text style={styles.TeacherViewScreeninfoValue}>{teacher?.designation}</Text>
                 </View>
               </View>
 
@@ -121,7 +156,7 @@ export const TeacherViewScreen = ({ route, navigation }) => {
                 <MaterialIcons name="work" size={20} color="#6B7280" />
                 <View>
                   <Text style={styles.TeacherViewScreeninfoLabel}>Status</Text>
-                  <Text style={styles.TeacherViewScreeninfoValue}>{teacherData.status}</Text>
+                  <Text style={styles.TeacherViewScreeninfoValue}>{teacher?.status}</Text>
                 </View>
               </View>
 
@@ -129,7 +164,7 @@ export const TeacherViewScreen = ({ route, navigation }) => {
                 <Ionicons name="male-female" size={20} color="#6B7280" />
                 <View>
                   <Text style={styles.TeacherViewScreeninfoLabel}>Gender</Text>
-                  <Text style={styles.TeacherViewScreeninfoValue}>{teacherData.gender}</Text>
+                  <Text style={styles.TeacherViewScreeninfoValue}>{teacher?.gender}</Text>
                 </View>
               </View>
             </View>
@@ -152,101 +187,105 @@ export const TeacherViewScreen = ({ route, navigation }) => {
           )}
         </View>
 
+       
         {/* Attendance Card - Collapsible */}
-        <View style={styles.TeacherViewScreencard}>
-          <CardHeader
-            title="Classes Attendance"
-            isExpanded={isAttendanceExpanded}
-            setIsExpanded={setIsAttendanceExpanded}
-            onEdit={() => navigation.navigate('EditTeacherAttendance', { teacherData })}
-          />
+<View style={styles.TeacherViewScreencard}>
+  <CardHeader
+    title="Classes Attendance"
+    isExpanded={isAttendanceExpanded}
+    setIsExpanded={setIsAttendanceExpanded}
+    onEdit={() => navigation.navigate('EditTeacherAttendance', { teacherData })}
+  />
 
-          {isAttendanceExpanded && (
-            <View style={styles.TeacherViewScreenattendanceContainer}>
-              {teacherData.coursesAttendance.map((course, index) => (
-                <View key={index} style={styles.TeacherViewScreenattendanceItem}>
-                  <View style={styles.TeacherViewScreencourseHeader}>
-                    <Text style={styles.TeacherViewScreencourseCode}>{course.code}</Text>
-                    <Text style={styles.TeacherViewScreencourseName}>{course.name}</Text>
-                  </View>
+  {isAttendanceExpanded && (
+    <View style={styles.TeacherViewScreenattendanceContainer}>
+      {(teacherData.coursesAttendance || []).map((course, index) => (
+        <View key={index} style={styles.TeacherViewScreenattendanceItem}>
+          <View style={styles.TeacherViewScreencourseHeader}>
+            <Text style={styles.TeacherViewScreencourseCode}>{course.code}</Text>
+            <Text style={styles.TeacherViewScreencourseName}>{course.name}</Text>
+          </View>
 
-                  <View style={styles.TeacherViewScreenattendanceStats}>
-                    <View style={styles.TeacherViewScreenattendanceDetail}>
-                      <Text style={styles.TeacherViewScreenstatLabel}>Total Classes</Text>
-                      <Text style={styles.TeacherViewScreenstatValue}>{course.totalClasses}</Text>
-                    </View>
-
-                    <View style={styles.TeacherViewScreenattendanceDetail}>
-                      <Text style={styles.TeacherViewScreenstatLabel}>Classes Taken</Text>
-                      <Text style={styles.TeacherViewScreenstatValue}>{course.classesTaken}</Text>
-                    </View>
-
-                    <View style={styles.TeacherViewScreenattendanceDetail}>
-                      <Text style={styles.TeacherViewScreenstatLabel}>Percentage</Text>
-                      <Text style={[
-                        styles.TeacherViewScreenstatValue,
-                        { color: parseFloat(calculateAttendancePercentage(course.classesTaken, course.totalClasses)) < 75 ? '#DC2626' : '#059669' }
-                      ]}>
-                        {calculateAttendancePercentage(course.classesTaken, course.totalClasses)}%
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.TeacherViewScreendeptSection}>
-                    <Text style={styles.TeacherViewScreendeptText}>{course.department}</Text>
-                    <Text style={styles.TeacherViewScreensectionText}>Section {course.section}</Text>
-                  </View>
-                </View>
-              ))}
+          <View style={styles.TeacherViewScreenattendanceStats}>
+            <View style={styles.TeacherViewScreenattendanceDetail}>
+              <Text style={styles.TeacherViewScreenstatLabel}>Total Classes</Text>
+              <Text style={styles.TeacherViewScreenstatValue}>{course.totalClasses}</Text>
             </View>
-          )}
+
+            <View style={styles.TeacherViewScreenattendanceDetail}>
+              <Text style={styles.TeacherViewScreenstatLabel}>Classes Taken</Text>
+              <Text style={styles.TeacherViewScreenstatValue}>{course.classesTaken}</Text>
+            </View>
+
+            <View style={styles.TeacherViewScreenattendanceDetail}>
+              <Text style={styles.TeacherViewScreenstatLabel}>Percentage</Text>
+              <Text style={[
+                styles.TeacherViewScreenstatValue,
+                { color: parseFloat(calculateAttendancePercentage(course.classesTaken, course.totalClasses)) < 75 ? '#DC2626' : '#059669' }
+              ]}>
+                {calculateAttendancePercentage(course.classesTaken, course.totalClasses)}%
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.TeacherViewScreendeptSection}>
+            <Text style={styles.TeacherViewScreendeptText}>{course.department}</Text>
+            <Text style={styles.TeacherViewScreensectionText}>Section {course.section}</Text>
+          </View>
         </View>
+      ))}
+    </View>
+  )}
+</View>
+
 
         {/* Feedback Card - Collapsible */}
-        <View style={styles.TeacherViewScreencard}>
-          <CardHeader
-            title="Student Feedback"
-            isExpanded={isFeedbackExpanded}
-            setIsExpanded={setIsFeedbackExpanded}
-            onEdit={() => navigation.navigate('EditTeacherFeedback', { teacherData })}
-          />
+       
+<View style={styles.TeacherViewScreencard}>
+  <CardHeader
+    title="Student Feedback"
+    isExpanded={isFeedbackExpanded}
+    setIsExpanded={setIsFeedbackExpanded}
+    onEdit={() => navigation.navigate('EditTeacherFeedback', { teacherData })}
+  />
 
-          {isFeedbackExpanded && (
-            <View style={styles.TeacherViewScreenfeedbackContainer}>
-              {teacherData.feedback.map((item, index) => (
-                <View key={index} style={styles.TeacherViewScreenfeedbackItem}>
-                  <View style={styles.TeacherViewScreenfeedbackHeader}>
-                    <Text style={styles.TeacherViewScreenfeedbackCourse}>{item.course.code}: {item.course.name}</Text>
-                    <View style={styles.TeacherViewScreenratingContainer}>
-                      <MaterialIcons name="star" size={20} color="#FCD34D" />
-                      <Text style={styles.TeacherViewScreenratingText}>{item.rating.toFixed(1)}/5.0</Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.TeacherViewScreenfeedbackDeptSection}>
-                    <Text style={styles.TeacherViewScreendeptText}>{item.department}</Text>
-                    <Text style={styles.TeacherViewScreensectionText}>Section {item.section}</Text>
-                  </View>
-
-                  <View style={styles.TeacherViewScreenfeedbackStats}>
-                    <View style={styles.TeacherViewScreenfeedbackStat}>
-                      <Text style={styles.TeacherViewScreenstatLabel}>Teaching</Text>
-                      <Text style={styles.TeacherViewScreenstatValue}>{item.teachingRating}/5</Text>
-                    </View>
-                    <View style={styles.TeacherViewScreenfeedbackStat}>
-                      <Text style={styles.TeacherViewScreenstatLabel}>Knowledge</Text>
-                      <Text style={styles.TeacherViewScreenstatValue}>{item.knowledgeRating}/5</Text>
-                    </View>
-                    <View style={styles.TeacherViewScreenfeedbackStat}>
-                      <Text style={styles.TeacherViewScreenstatLabel}>Communication</Text>
-                      <Text style={styles.TeacherViewScreenstatValue}>{item.communicationRating}/5</Text>
-                    </View>
-                  </View>
-                </View>
-              ))}
+  {isFeedbackExpanded && (
+    <View style={styles.TeacherViewScreenfeedbackContainer}>
+      {(teacherData.feedbacks || []).map((item, index) => (
+        <View key={index} style={styles.TeacherViewScreenfeedbackItem}>
+          <View style={styles.TeacherViewScreenfeedbackHeader}>
+            <Text style={styles.TeacherViewScreenfeedbackCourse}>{item.course?.code}: {item.course?.name}</Text>
+            <View style={styles.TeacherViewScreenratingContainer}>
+              <MaterialIcons name="star" size={20} color="#FCD34D" />
+              <Text style={styles.TeacherViewScreenratingText}>{item.rating.toFixed(1)}/5.0</Text>
             </View>
-          )}
+          </View>
+
+          <View style={styles.TeacherViewScreenfeedbackDeptSection}>
+            <Text style={styles.TeacherViewScreendeptText}>{item.department}</Text>
+            <Text style={styles.TeacherViewScreensectionText}>Section {item.section}</Text>
+          </View>
+
+          <View style={styles.TeacherViewScreenfeedbackStats}>
+            <View style={styles.TeacherViewScreenfeedbackStat}>
+              <Text style={styles.TeacherViewScreenstatLabel}>Teaching</Text>
+              <Text style={styles.TeacherViewScreenstatValue}>{item.teachingRating}/5</Text>
+            </View>
+            <View style={styles.TeacherViewScreenfeedbackStat}>
+              <Text style={styles.TeacherViewScreenstatLabel}>Knowledge</Text>
+              <Text style={styles.TeacherViewScreenstatValue}>{item.knowledgeRating}/5</Text>
+            </View>
+            <View style={styles.TeacherViewScreenfeedbackStat}>
+              <Text style={styles.TeacherViewScreenstatLabel}>Communication</Text>
+              <Text style={styles.TeacherViewScreenstatValue}>{item.communicationRating}/5</Text>
+            </View>
+          </View>
         </View>
+      ))}
+    </View>
+  )}
+</View>
+
       </ScrollView>
     </View>
   );
