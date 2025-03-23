@@ -14,7 +14,8 @@
     "@expo/vector-icons": "^14.0.2",
     "@heroicons/react": "^2.2.0",
     "@react-native-async-storage/async-storage": "1.23.1",
-    "@react-native-community/datetimepicker": "^8.2.0",
+    "@react-native-community/datetimepicker": "8.2.0",
+    "@react-native-picker/picker": "2.9.0",
     "@react-native-vector-icons/material-icons": "^0.0.1",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/native-stack": "^7.2.0",
@@ -23,9 +24,9 @@
     "expo": "~52.0.26",
     "expo-blur": "~14.0.3",
     "expo-crypto": "~14.0.2",
-    "expo-blur": "~14.0.3",
     "expo-image-picker": "~16.0.4",
     "expo-linear-gradient": "~14.0.2",
+    "expo-media-library": "~17.0.6",
     "expo-status-bar": "~2.0.1",
     "lucide-react": "^0.474.0",
     "lucide-react-native": "^0.469.0",
@@ -44,9 +45,8 @@
     "react-native-screens": "^4.6.0",
     "react-native-svg": "^15.8.0",
     "react-native-svg-transformer": "^1.5.0",
-    "react-native-vector-icons": "^10.2.0",
-    "expo-linear-gradient": "~14.0.2",
-    "expo-blur": "~14.0.3"
+    "react-native-toast-message": "^2.2.1",
+    "react-native-vector-icons": "^10.2.0"
   },
   "proxy": "http://192.168.56.1:7205",
   "devDependencies": {

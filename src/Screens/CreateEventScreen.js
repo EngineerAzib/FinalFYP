@@ -1,51 +1,129 @@
-// src/screens/CreateEventScreen.js
-import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Text } from 'react-native';
 import { Header } from '../Components/Header';
 import { SectionContainer } from '../Components/SectionContainer';
 import { CustomButton } from '../Components/CustomButton';
 import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import styles from '../AdminPortal_Css';
+import GetNewsCategory from '../Services/NewsService/GetNewsCategory';
+import axios from 'axios';
+import { API_BASE_URL } from '../Services/Config';
+
 
 export const CreateEventScreen = ({ navigation }) => {
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    date: '',
-    time: '',
-    venue: '',
-    organizer: '',
-    maxParticipants: '',
-    registrationDeadline: '',
-    eventType: '',
-    image: null
+    name: '', // Name of the event
+    description: '', // Description of the event
+    location: '', // Location of the event
+    startDate: '', // Start date of the event
+    endDate: '', // End date of the event
+    startTime: '', // Start time of the event
+    endTime: '', // End time of the event
+    eventCategoryId: '', // ID of the selected event category
+    imageUrl: null, // URL or base64 string for the image
   });
 
-  const eventTypes = [
-    'Conference',
-    'Workshop',
-    'Seminar',
-    'Competition',
-    'Cultural Event',
-    'Sports Event',
-    'Other'
-  ];
+  const [eventCategories, setEventCategories] = useState([]); // State to store event categories
+  const [loading, setLoading] = useState(true); // Loading state
 
+  // Fetch event categories on component mount
+  useEffect(() => {
+    const fetchEventCategories = async () => {
+      try {
+        const data = await GetNewsCategory();
+        setEventCategories(data); // Set fetched categories
+      } catch (error) {
+        console.error('Error fetching event categories:', error);
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    };
+    fetchEventCategories();
+  }, []);
+
+  // Handle form submission
   const handleSubmit = async () => {
     try {
-      // Here you would make your API call to create a new event
-      // await createEvent(formData);
-
+      const formDataToSend = new FormData();
+  
+      // Append standard fields
+      formDataToSend.append('Name', formData.name);
+      formDataToSend.append('Description', formData.description);
+      formDataToSend.append('Location', formData.location);
+      formDataToSend.append('EventCategoryId', parseInt(formData.eventCategoryId, 10)); // Ensure it's a number
+  
+      // Append Start Date fields
+      if (formData.startDate) {
+        const [year, month, day] = formData.startDate.split('-'); // Assumes YYYY-MM-DD format
+        formDataToSend.append('StartDate.Year', parseInt(year, 10));
+        formDataToSend.append('StartDate.Month', parseInt(month, 10)); // Months are 1-based
+        formDataToSend.append('StartDate.Day', parseInt(day, 10));
+      }
+  
+      // Append End Date fields
+      if (formData.endDate) {
+        const [year, month, day] = formData.endDate.split('-'); // Assumes YYYY-MM-DD format
+        formDataToSend.append('EndDate.Year', parseInt(year, 10));
+        formDataToSend.append('EndDate.Month', parseInt(month, 10)); // Months are 1-based
+        formDataToSend.append('EndDate.Day', parseInt(day, 10));
+      }
+  
+      // Append Start Time fields
+      if (formData.startTime) {
+        const [hour, minute] = formData.startTime.split(':');
+        formDataToSend.append('StartTime.Hour', parseInt(hour, 10));
+        formDataToSend.append('StartTime.Minute', parseInt(minute, 10));
+      }
+  
+      // Append End Time fields
+      if (formData.endTime) {
+        const [hour, minute] = formData.endTime.split(':');
+        formDataToSend.append('EndTime.Hour', parseInt(hour, 10));
+        formDataToSend.append('EndTime.Minute', parseInt(minute, 10));
+      }
+  
+      // Handle image upload
+      if (formData.imageUrl) {
+        formDataToSend.append('image', {
+          uri: formData.imageUrl, // URI of the image
+          type: 'image/jpeg', // Change based on actual image type
+          name: 'event_image.jpg', // Name of the file
+        });
+      } else {
+        console.error('Image is required.');
+        throw new Error('Image is required.');
+      }
+  
+      // Debug the FormData
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
+      }
+  
+      // Send request
+      const response = await axios.post(`${API_BASE_URL}/api/Events/AddEvents`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Set the content type
+        },
+      });
+  
+      console.log('Event created successfully:', response.data);
       navigation.goBack();
     } catch (error) {
       console.error('Error creating event:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+        console.error('Response headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
     }
   };
+
   return (
-    // IMPORTANT: The root View must have flex: 1 to fill the screen
-    // This allows us to properly position the footer at the bottom
     <View style={styles.CreateEventScreenmainContainer}>
       <Header />
       <CustomHeader
@@ -56,10 +134,7 @@ export const CreateEventScreen = ({ navigation }) => {
         navigation={navigation}
       />
 
-      {/* Content container needs flex: 1 to properly fill available space */}
       <View style={styles.CreateEventScreencontentContainer}>
-        {/* ScrollView should not have flex: 1 in its style prop */}
-        {/* Instead, it should naturally fill the space between header and footer */}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.CreateEventScreenscrollContent}
@@ -76,25 +151,15 @@ export const CreateEventScreen = ({ navigation }) => {
               <Text style={styles.CreateEventScreenlegendText}>Optional</Text>
             </View>
           </View>
-          <SectionContainer sectionNumber="1" title="Publish Event">
 
+          <SectionContainer sectionNumber="1" title="Event Details">
             <FormField
-              label="Event Title"
-              placeholder="Enter event title"
-              value={formData.title}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, title: text }))}
-              // required={true}
-              type="text"
-            />
-
-            <FormField
-              label="Event Type"
-              placeholder="Select event type"
-              value={formData.eventType}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, eventType: text }))}
+              label="Event Name"
+              placeholder="Enter event name"
+              value={formData.name}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
               required={true}
-              type="select"
-              options={eventTypes}
+              type="text"
             />
 
             <FormField
@@ -103,75 +168,78 @@ export const CreateEventScreen = ({ navigation }) => {
               value={formData.description}
               onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
               required={true}
+              type="textarea"
+            />
+
+            <FormField
+              label="Location"
+              placeholder="Enter event location"
+              value={formData.location}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, location: text }))}
+              required={true}
               type="text"
             />
 
             <FormField
-              label="Event Date"
-              placeholder="Select event date"
-              value={formData.date}
-              onChangeText={(date) => setFormData(prev => ({ ...prev, date }))}
+              label="Start Date"
+              placeholder="Select start date"
+              value={formData.startDate}
+              onChangeText={(date) => setFormData(prev => ({ ...prev, startDate: date }))}
               required={true}
               type="date"
             />
 
             <FormField
-              label="Event Time"
-              placeholder="Select event time"
-              value={formData.time}
-              onChangeText={(time) => setFormData(prev => ({ ...prev, time }))}
-              required={true}
-              type="text"
-            />
-
-            <FormField
-              label="Venue"
-              placeholder="Enter event venue"
-              value={formData.venue}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, venue: text }))}
-              required={true}
-              type="text"
-            />
-
-            <FormField
-              label="Organizer"
-              placeholder="Enter organizer name"
-              value={formData.organizer}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, organizer: text }))}
-              required={true}
-              type="text"
-            />
-
-            <FormField
-              label="Maximum Participants"
-              placeholder="Enter maximum participants"
-              value={formData.maxParticipants}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, maxParticipants: text }))}
-              required={true}
-              type="text"
-              keyboardType="numeric"
-            />
-
-            <FormField
-              label="Registration Deadline"
-              placeholder="Select registration deadline"
-              value={formData.registrationDeadline}
-              onChangeText={(date) => setFormData(prev => ({ ...prev, registrationDeadline: date }))}
+              label="End Date"
+              placeholder="Select end date"
+              value={formData.endDate}
+              onChangeText={(date) => setFormData(prev => ({ ...prev, endDate: date }))}
               required={true}
               type="date"
+            />
+
+            <FormField
+              label="Start Time"
+              placeholder="Select start time"
+              value={formData.startTime}
+              onChangeText={(time) => setFormData(prev => ({ ...prev, startTime: time }))}
+              required={true}
+              type="time"
+            />
+
+            <FormField
+              label="End Time"
+              placeholder="Select end time"
+              value={formData.endTime}
+              onChangeText={(time) => setFormData(prev => ({ ...prev, endTime: time }))}
+              required={true}
+              type="time"
+            />
+
+            <FormField
+              label="Event Category"
+              placeholder="Select event category"
+              value={formData.eventCategoryId}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, eventCategoryId: text }))}
+              required={true}
+              type="select"
+              options={eventCategories.map(category => ({
+                label: category.title, // Display category name
+                value: category.id.toString(), // Save category ID
+              }))}
             />
 
             <FormField
               label="Event Banner"
               placeholder="Upload event banner"
-              value={formData.image}
-              onChangeText={(uri) => setFormData(prev => ({ ...prev, image: uri }))}
+              value={formData.imageUrl}
+              onChangeText={(uri) => setFormData(prev => ({ ...prev, imageUrl: uri }))}
               type="file"
               maxSize="5MB"
             />
           </SectionContainer>
-
         </ScrollView>
+
         <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
             buttons={[
@@ -184,13 +252,11 @@ export const CreateEventScreen = ({ navigation }) => {
                 title: "Create Event",
                 onPress: handleSubmit,
                 variant: "primary",
-              }
+              },
             ]}
           />
         </View>
-      </View >
-
-    </View >
+      </View>
+    </View>
   );
 };
-

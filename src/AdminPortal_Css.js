@@ -5246,6 +5246,17 @@ const AdminPortal_Css = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 8,
   },
+  FormFieldinputError: {
+  borderColor: 'red', // Example: Change border color for error
+},
+FormFieldinputWrapperError: {
+  borderColor: 'red', // Example: Change border color for error
+},
+FormFielderrorText: {
+  color: 'red',
+  fontSize: 12,
+  marginTop: 4,
+},
   FormFieldlastValueText: {
     color: '#6C63FF',
     fontSize: 12,

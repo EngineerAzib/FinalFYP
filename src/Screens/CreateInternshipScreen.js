@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
@@ -7,51 +7,82 @@ import { FormField } from '../Components/FormField';
 import { SectionContainer } from '../Components/SectionContainer';
 import styles from '../AdminPortal_Css';
 import { CustomButton } from '../Components/CustomButton';
+import GetDepartmentList from '../Services/CoursesService/GetDepartmentList';
+import GetYearlist from '../Services/ExaminationSchedule/GetYearlist';
+import axios from 'axios';
+import { API_BASE_URL } from '../Services/Config';
 
 export const CreateInternshipScreen = ({ navigation }) => {
   const [formData, setFormData] = useState({
     title: '',
-    company: '',
+    companyName: '',
     location: '',
-    type: '',
     duration: '',
-    stipend: '',
-    positions: '',
-    deadline: '',
-    status: '',
-    requirements: '',
+    stippend: '',
+    position: '',
+    applicationDeadline: '',
     description: '',
-    responsibilities: '',
-    qualifications: ''
+    year: '',
+    departmentId: ''
   });
 
-  const internshipTypes = [
-    'Full-time',
-    'Part-time',
-    'Remote',
-    'Hybrid'
-  ];
+  const [departments, setDepartments] = useState([]); // State for departments dropdown
+  const [years, setYears] = useState([]); // State for years dropdown
+  const [loading, setLoading] = useState(false); // State for loading indicator
+  const [error, setError] = useState(null); // State for error handling
 
-  const statusOptions = [
-    'Active',
-    'Upcoming',
-    'Closed'
-  ];
+  // Fetch departments and years data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const departmentsData = await GetDepartmentList();
+        const yearsData = await GetYearlist();
+
+        setDepartments(departmentsData || []);
+        setYears(yearsData || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleCreate = async () => {
     try {
-      // Here you would make your API call to create the internship
-      // await createInternship(formData);
+      setLoading(true); // Show loading indicator
+      setError(null); // Clear previous errors
 
+      const payload = {
+        title: formData.title,
+        companyName: formData.companyName,
+        location: formData.location,
+        duration: formData.duration,
+        stippend: parseFloat(formData.stippend), // Convert to number
+        position: parseInt(formData.position, 10), // Convert to number
+        applicationDeadline: new Date(formData.applicationDeadline).toISOString(), // Format as ISO string
+        description: formData.description,
+        year: parseInt(formData.year, 10), // Convert to number
+        departmentId: parseInt(formData.departmentId, 10) // Convert to number
+      };
+
+      console.log('Payload:', payload);
+
+      // Send payload to API
+      const response = await axios.post(`${API_BASE_URL}/api/Interenship/AddInternship`, payload);
+      console.log('Internship created successfully:', response.data);
+
+      // Navigate back or show success message
       navigation.goBack();
     } catch (error) {
-      console.error('Error creating internship:', error);
+      console.error('Error creating internship:', error.response ? error.response.data : error.message);
+      setError('Failed to create internship. Please try again.'); // Set error message
+    } finally {
+      setLoading(false); // Hide loading indicator
     }
   };
 
   return (
-    // IMPORTANT: The root View must have flex: 1 to fill the screen
-    // This allows us to properly position the footer at the bottom
     <View style={styles.CreateInternshipScreenmainContainer}>
       <Header />
       <CustomHeader
@@ -63,7 +94,6 @@ export const CreateInternshipScreen = ({ navigation }) => {
       />
 
       <View style={styles.CreateInternshipScreencontentContainer}>
-
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.CreateInternshipScreenscrollContent}
@@ -94,8 +124,8 @@ export const CreateInternshipScreen = ({ navigation }) => {
             <FormField
               label="Company Name"
               placeholder="Enter company name"
-              value={formData.company}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, company: text }))}
+              value={formData.companyName}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, companyName: text }))}
               required={true}
               type="text"
             />
@@ -112,16 +142,6 @@ export const CreateInternshipScreen = ({ navigation }) => {
 
           <SectionContainer sectionNumber="2" title="Internship Details">
             <FormField
-              label="Internship Type"
-              placeholder="Select internship type"
-              value={formData.type}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, type: text }))}
-              required={true}
-              type="select"
-              options={internshipTypes}
-            />
-
-            <FormField
               label="Duration"
               placeholder="Enter duration (e.g., 6 months)"
               value={formData.duration}
@@ -133,17 +153,18 @@ export const CreateInternshipScreen = ({ navigation }) => {
             <FormField
               label="Stipend"
               placeholder="Enter stipend amount"
-              value={formData.stipend}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, stipend: text }))}
+              value={formData.stippend}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, stippend: text }))}
               required={true}
               type="text"
+              keyboardType="numeric"
             />
 
             <FormField
               label="Number of Positions"
               placeholder="Enter number of positions"
-              value={formData.positions}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, positions: text }))}
+              value={formData.position}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, position: text }))}
               required={true}
               type="text"
               keyboardType="numeric"
@@ -152,36 +173,40 @@ export const CreateInternshipScreen = ({ navigation }) => {
             <FormField
               label="Application Deadline"
               placeholder="Select deadline"
-              value={formData.deadline}
-              onChangeText={(date) => setFormData(prev => ({ ...prev, deadline: date }))}
+              value={formData.applicationDeadline}
+              onChangeText={(date) => setFormData(prev => ({ ...prev, applicationDeadline: date }))}
               required={true}
               type="date"
             />
 
             <FormField
-              label="Status"
-              placeholder="Select status"
-              value={formData.status}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, status: text }))}
+              label="Year"
+              placeholder="Select year"
+              value={formData.year}
+              onChangeText={(value) => setFormData(prev => ({ ...prev, year: value }))}
               required={true}
               type="select"
-              options={statusOptions}
+              options={years.map(year => ({
+                label: year.yearName || 'Unknown Year', // Fallback for undefined
+                value: year.yearId ? year.yearId.toString() : '', // Ensure id is defined
+              }))}
+            />
+
+            <FormField
+              label="Department"
+              placeholder="Select department"
+              value={formData.departmentId}
+              onChangeText={(value) => setFormData(prev => ({ ...prev, departmentId: value }))}
+              required={true}
+              type="select"
+              options={departments.map(dept => ({
+                label: dept.departmentName || 'Unknown Department', // Fallback for undefined
+                value: dept.id ? dept.id.toString() : '', // Ensure id is defined
+              }))}
             />
           </SectionContainer>
 
           <SectionContainer sectionNumber="3" title="Detailed Information">
-            <FormField
-              label="Requirements"
-              placeholder="Enter technical requirements, skills needed"
-              value={formData.requirements}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, requirements: text }))}
-              required={true}
-              type="textarea"
-              multiline={true}
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-
             <FormField
               label="Description"
               placeholder="Enter detailed internship description"
@@ -193,35 +218,13 @@ export const CreateInternshipScreen = ({ navigation }) => {
               numberOfLines={6}
               textAlignVertical="top"
             />
-
-            <FormField
-              label="Responsibilities"
-              placeholder="Enter key responsibilities and expectations"
-              value={formData.responsibilities}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, responsibilities: text }))}
-              required={true}
-              type="textarea"
-              multiline={true}
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-
-            <FormField
-              label="Qualifications"
-              placeholder="Enter required qualifications and experience"
-              value={formData.qualifications}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, qualifications: text }))}
-              required={true}
-              type="textarea"
-              multiline={true}
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
-
-
           </SectionContainer>
+        </ScrollView>
 
-        </ScrollView >
+        {/* Error Message */}
+        {error && (
+          <Text style={styles.errorText}>{error}</Text>
+        )}
 
         <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
@@ -232,18 +235,15 @@ export const CreateInternshipScreen = ({ navigation }) => {
                 variant: "secondary",
               },
               {
-                title: "Create Internship",
+                title: loading ? "Creating..." : "Create Internship",
                 onPress: handleCreate,
                 variant: "primary",
+                disabled: loading, // Disable button when loading
               }
             ]}
           />
         </View>
-      </View >
-
-    </View >
-
-
+      </View>
+    </View>
   );
 };
-

@@ -49,14 +49,14 @@ import { NotificationScreen } from './src/Screens/NotificationScreen';
 import { AuthScreen } from './src/Screens/AuthScreen';
 import { Navigation } from './src/Screens/Navigation';
 import CreateTeacherForm from './src/Screens/CreateTeacherForm';
-
+import Toast from 'react-native-toast-message';
 const Stack = createNativeStackNavigator();
 function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
 
-
+     
         <Stack.Screen name="Dashboard" component={Dashboard} />
         <Stack.Screen name="AdminProfile" component={AdminProfile} />
 
@@ -134,6 +134,7 @@ function App() {
 
 
       </Stack.Navigator>
+      <Toast />
     </NavigationContainer>
   );
 }

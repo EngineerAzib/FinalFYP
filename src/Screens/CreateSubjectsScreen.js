@@ -4,7 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Text
+  Text,
 } from 'react-native';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
@@ -12,33 +12,63 @@ import { FormField } from '../Components/FormField';
 import { SectionContainer } from '../Components/SectionContainer';
 import styles from '../AdminPortal_Css';
 import { CustomButton } from '../Components/CustomButton';
+import GetDepartmentList from '../Services/CoursesService/GetDepartmentList';
+import GetTeacherList from '../Services/CoursesService/GetTeacherList';
+import GetSemesterList from '../Services/CoursesService/SemesterList';
+import GetCourseList from '../Services/CoursesService/GetCourseList';
+import axios from 'axios';
+import { API_BASE_URL } from '../Services/Config';
 
 const CreateSubjectsScreen = ({ navigation }) => {
   const [subjects, setSubjects] = useState([
     {
+      name: '',
+      initialName: '',
+      isElective: false,
+      credits: '',
       departmentId: '',
-      year: '',
-      semester: '',
-      subjectName: '',
-      theoryMarks: '',
-      practicalMarks: '',
-    }
+      semesterId: '',
+      teacherId: '',
+      prerequisiteIds: [], // Ensure this is always an array
+    },
   ]);
+
   const [departments, setDepartments] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [semesters, setSemesters] = useState([]);
+  const [prerequisites, setPrerequisites] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulating fetching departments (Replace with API call)
-    setDepartments([
-      { id: 1, name: 'Computer Science' },
-      { id: 2, name: 'Electrical Engineering' },
-    ]);
-    setLoading(false);
+    const fetchData = async () => {
+      try {
+        const departmentsData = await GetDepartmentList();
+        const teachersData = await GetTeacherList();
+        const semestersData = await GetSemesterList();
+        const coursesData = await GetCourseList();
+
+        setDepartments(departmentsData);
+        setTeachers(teachersData);
+        setSemesters(semestersData);
+        setPrerequisites(coursesData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleInputChange = (index, field, value) => {
     const updatedSubjects = [...subjects];
-    updatedSubjects[index][field] = value;
+    if (field === 'prerequisiteIds') {
+      // Ensure prerequisiteIds is always an array
+      updatedSubjects[index][field] = Array.isArray(value) ? value : [];
+    } else {
+      updatedSubjects[index][field] = value;
+    }
     setSubjects(updatedSubjects);
   };
 
@@ -46,13 +76,15 @@ const CreateSubjectsScreen = ({ navigation }) => {
     setSubjects([
       ...subjects,
       {
+        name: '',
+        initialName: '',
+        isElective: false,
+        credits: '',
         departmentId: '',
-        year: '',
-        semester: '',
-        subjectName: '',
-        theoryMarks: '',
-        practicalMarks: '',
-      }
+        semesterId: '',
+        teacherId: '',
+        prerequisiteIds: [], // Ensure this is always an array
+      },
     ]);
   };
 
@@ -61,9 +93,54 @@ const CreateSubjectsScreen = ({ navigation }) => {
     setSubjects(updatedSubjects);
   };
 
+  const validateSubject = (subject) => {
+    if (!subject.name || !subject.initialName) {
+      throw new Error('Subject name and initial name are required.');
+    }
+    if (isNaN(subject.credits)) {
+      throw new Error('Credits must be a number.');
+    }
+    if (isNaN(subject.departmentId)) {
+      throw new Error('Department ID must be a number.');
+    }
+    if (isNaN(subject.semesterId)) {
+      throw new Error('Semester ID must be a number.');
+    }
+    if (isNaN(subject.teacherId)) {
+      throw new Error('Teacher ID must be a number.');
+    }
+    if (!Array.isArray(subject.prerequisiteIds)) {
+      throw new Error('Prerequisite IDs must be an array.');
+    }
+  };
+
   const handleSubmit = async () => {
-    // TODO: Implement API call to save subjects
-    console.log('Subjects:', subjects);
+    try {
+      for (const subject of subjects) {
+        validateSubject(subject);
+
+        const payload = {
+          name: subject.name,
+          initialName: subject.initialName,
+          isElective: subject.isElective,
+          credits: parseInt(subject.credits, 10),
+          departmentId: parseInt(subject.departmentId, 10),
+          semesterId: parseInt(subject.semesterId, 10),
+          teacherId: parseInt(subject.teacherId, 10),
+          prerequisiteIds: Array.isArray(subject.prerequisiteIds)
+            ? subject.prerequisiteIds.map((id) => parseInt(id, 10))
+            : [], // Default to an empty array
+        };
+        console.log('Payload:', payload);
+
+        const response = await axios.post(`${API_BASE_URL}/api/Course/add-course`, payload);
+        console.log('Subject created successfully:', response.data);
+      }
+
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error creating subjects:', error.response ? error.response.data : error.message);
+    }
   };
 
   return (
@@ -99,65 +176,81 @@ const CreateSubjectsScreen = ({ navigation }) => {
             {subjects.map((subject, index) => (
               <View key={index}>
                 <FormField
+                  label="Subject Name"
+                  required
+                  value={subject.name}
+                  onChangeText={(value) => handleInputChange(index, 'name', value)}
+                  placeholder="Enter subject name"
+                />
+
+                <FormField
+                  label="Initial Name"
+                  required
+                  value={subject.initialName}
+                  onChangeText={(value) => handleInputChange(index, 'initialName', value)}
+                  placeholder="Enter subject code (e.g., CS101)"
+                />
+
+                <FormField
+                  label="Credits"
+                  required
+                  value={subject.credits}
+                  onChangeText={(value) => handleInputChange(index, 'credits', value)}
+                  placeholder="Enter number of credits"
+                  keyboardType="numeric"
+                />
+
+                <FormField
                   label="Department"
                   placeholder="Select Department"
                   type="select"
                   required
-                  value={subject.departmentId}  // ✅ Fixed value
-                  onChangeText={(value) => handleInputChange(index, 'departmentId', value)} // ✅ Fixed handler
-                />
-                <FormField
-                  required
-                  label="Year"
-                  dropdown
-                  value={subject.year}
-                  onValueChange={(value) => handleInputChange(index, 'year', value)} // ✅ Fixed handler
-                  items={[
-                    { label: '1st Year', value: '1' },
-                    { label: '2nd Year', value: '2' },
-                    { label: '3rd Year', value: '3' },
-                    { label: '4th Year', value: '4' },
-                  ]}
-                  placeholder="Select Year"
+                  value={subject.departmentId}
+                  onChangeText={(value) => handleInputChange(index, 'departmentId', value)}
+                  options={departments.map((dept) => ({
+                    label: dept.departmentName,
+                    value: dept.id.toString(),
+                  }))}
                 />
 
                 <FormField
                   label="Semester"
-                  required
-                  dropdown
-                  value={subject.semester}
-                  onValueChange={(value) => handleInputChange(index, 'semester', value)} // ✅ Fixed handler
-                  items={[
-                    { label: '1st Semester', value: '1' },
-                    { label: '2nd Semester', value: '2' },
-                  ]}
                   placeholder="Select Semester"
-                />
-
-                <FormField
-                  label="Subject Name"
+                  type="select"
                   required
-                  value={subject.subjectName}
-                  onChangeText={(value) => handleInputChange(index, 'subjectName', value)}
-                  placeholder="Name Of Subject"
+                  value={subject.semesterId}
+                  onChangeText={(value) => handleInputChange(index, 'semesterId', value)}
+                  options={semesters.map((sem) => ({
+                    label: sem.semesterName,
+                    value: sem.id.toString(),
+                  }))}
                 />
 
                 <FormField
-                  label="Theory Marks"
+                  label="Teacher"
+                  placeholder="Select Teacher"
+                  type="select"
                   required
-                  value={subject.theoryMarks}
-                  onChangeText={(value) => handleInputChange(index, 'theoryMarks', value)}
-                  placeholder="Total Theory Marks"
-                  keyboardType="numeric"
+                  value={subject.teacherId}
+                  onChangeText={(value) => handleInputChange(index, 'teacherId', value)}
+                  options={teachers.map((teacher) => ({
+                    label: teacher.name,
+                    value: teacher.id.toString(),
+                  }))}
                 />
 
-                <FormField
-                  label="Practical Marks"
-                  value={subject.practicalMarks}
-                  onChangeText={(value) => handleInputChange(index, 'practicalMarks', value)}
-                  placeholder="Total Practical Marks (if any)"
-                  keyboardType="numeric"
-                />
+<FormField
+  label="Prerequisites"
+  placeholder="Select Prerequisites"
+  type="select"
+  multiple // Allow multiple selections
+  value={subject.prerequisiteIds || []} // Ensure value is always an array
+  onChangeText={(value) => handleInputChange(index, 'prerequisiteIds', value)}
+  options={prerequisites.map((course) => ({
+    label: course.name, // Display course name
+    value: course.id.toString(), // Save course ID as a string
+  }))}
+/>
               </View>
             ))}
           </SectionContainer>
@@ -179,24 +272,24 @@ const CreateSubjectsScreen = ({ navigation }) => {
               </TouchableOpacity>
             )}
           </View>
+        </ScrollView>
 
-        </ScrollView>  
         <View style={styles.CreateExamSchedulebuttonContainer}>
-            <CustomButton
-              buttons={[
-                {
-                  title: "Cancel",
-                  onPress: () => navigation.goBack(),
-                  variant: "secondary",
-                },
-                {
-                  title: "Create Course",
-                  onPress: handleSubmit,
-                  variant: "primary",
-                }
-              ]}
-            />
-          </View>
+          <CustomButton
+            buttons={[
+              {
+                title: 'Cancel',
+                onPress: () => navigation.goBack(),
+                variant: 'secondary',
+              },
+              {
+                title: 'Create Course',
+                onPress: handleSubmit,
+                variant: 'primary',
+              },
+            ]}
+          />
+        </View>
       </View>
     </View>
   );

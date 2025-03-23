@@ -6,88 +6,67 @@ import { Header } from '../Components/Header';
 import styles from '../AdminPortal_Css';
 import { SectionContainer } from '../Components/SectionContainer';
 import { CustomButton } from '../Components/CustomButton';
-
+import { CreateDepartment } from '../Services/DepartmentService/AddDepartment.js'; // Import the API function
+import Toast from 'react-native-toast-message';
+import { ToastConfig } from '../Components/ToastConfig.js';
 export const CreateDepartmentScreen = ({ navigation }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    totalStudents: '',
-    boysCount: '',
-    girlsCount: '',
+    departmentName: '',
+    departmentCode: '',
+    maleStudent: '',
+    femaleStudent: '',
   });
 
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.name.trim()) {
-      newErrors.name = 'Department name is required';
+    if (!formData.departmentName.trim()) {
+      newErrors.departmentName = 'Department name is required';
     }
-
-    const totalStudents = parseInt(formData.totalStudents);
-    const boysCount = parseInt(formData.boysCount);
-    const girlsCount = parseInt(formData.girlsCount);
-
-    if (isNaN(totalStudents) || totalStudents <= 0) {
-      newErrors.totalStudents = 'Please enter a valid number of students';
+    if (!formData.departmentCode.trim()) {
+      newErrors.departmentCode = 'Department code is required';
     }
-
-    if (isNaN(boysCount) || boysCount < 0) {
-      newErrors.boysCount = 'Please enter a valid number of male students';
+    if (!formData.maleStudent.trim()) {
+      newErrors.maleStudent = 'Number of male students is required';
     }
-
-    if (isNaN(girlsCount) || girlsCount < 0) {
-      newErrors.girlsCount = 'Please enter a valid number of female students';
-    }
-
-    if (boysCount + girlsCount !== totalStudents) {
-      newErrors.totalStudents = 'Total students should equal sum of boys and girls';
+    if (!formData.femaleStudent.trim()) {
+      newErrors.femaleStudent = 'Number of female students is required';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      // Calculate percentages
-      const totalStudents = parseInt(formData.totalStudents);
-      const boysCount = parseInt(formData.boysCount);
-      const girlsCount = parseInt(formData.girlsCount);
-
       const departmentData = {
-        name: formData.name,
-        totalStudents,
-        genderStats: {
-          boys: {
-            count: boysCount,
-            percentage: Math.round((boysCount / totalStudents) * 100),
-          },
-          girls: {
-            count: girlsCount,
-            percentage: Math.round((girlsCount / totalStudents) * 100),
-          },
-        },
+        departmentName: formData.departmentName,
+        departmentCode: formData.departmentCode,
+        maleStudent: parseInt(formData.maleStudent, 10),
+        femaleStudent: parseInt(formData.femaleStudent, 10),
       };
 
-      // Here you would typically make an API call to save the department
-      console.log('New Department Data:', departmentData);
-      Alert.alert('Success', 'Department created successfully!');
-      navigation.goBack();
-    }
-  };
-  const handleUpdate = async () => {
-    try {
-      // Here you would make your API call
-      // await updateEvent(eventData.id, formData);
-
-      navigation.goBack();
-    } catch (error) {
-      console.error('Error updating event:', error);
+      try {
+        await CreateDepartment(departmentData); // Use the API function
+        Toast.show({
+          type: 'success',
+          text1: 'Department created successfully!',
+          onHide: () => navigation.goBack(),
+        });
+  
+        // navigation.goBack();
+      } catch (error) {
+        // Show error toast
+        Toast.show({
+          type: 'error',
+          text1: error.message || 'An error occurred while creating the department',
+        });
+      }
     }
   };
 
   return (
-
     <View style={styles.CreateDepartmentScreenmainContainer}>
       <Header />
       <CustomHeader
@@ -99,7 +78,6 @@ export const CreateDepartmentScreen = ({ navigation }) => {
       />
 
       <View style={styles.CreateDepartmentScreencontentContainer}>
-
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.CreateDepartmentScreenscrollContent}
@@ -116,44 +94,43 @@ export const CreateDepartmentScreen = ({ navigation }) => {
               <Text style={styles.CreateDepartmentScreenlegendText}>Optional</Text>
             </View>
           </View>
-          <SectionContainer sectionNumber="1" title="Department Information">
 
+          <SectionContainer sectionNumber="1" title="Department Information">
             <FormField
               label="Department Name"
               placeholder="Enter department name"
-              value={formData.name}
-              onChangeText={(text) => setFormData({ ...formData, name: text })}
-              error={errors.name}
+              value={formData.departmentName}
+              onChangeText={(text) => setFormData({ ...formData, departmentName: text })}
+              error={errors.departmentName}
               required
             />
 
             <FormField
-              label="Total Students"
-              placeholder="Enter total number of students"
-              value={formData.totalStudents}
-              onChangeText={(text) => setFormData({ ...formData, totalStudents: text })}
-              keyboardType="numeric"
-              error={errors.totalStudents}
+              label="Department Code"
+              placeholder="Enter department code"
+              value={formData.departmentCode}
+              onChangeText={(text) => setFormData({ ...formData, departmentCode: text })}
+              error={errors.departmentCode}
               required
             />
 
             <FormField
-              label="Number of Boys"
+              label="Number of Male Students"
               placeholder="Enter number of male students"
-              value={formData.boysCount}
-              onChangeText={(text) => setFormData({ ...formData, boysCount: text })}
+              value={formData.maleStudent}
+              onChangeText={(text) => setFormData({ ...formData, maleStudent: text })}
               keyboardType="numeric"
-              error={errors.boysCount}
+              error={errors.maleStudent}
               required
             />
 
             <FormField
-              label="Number of Girls"
+              label="Number of Female Students"
               placeholder="Enter number of female students"
-              value={formData.girlsCount}
-              onChangeText={(text) => setFormData({ ...formData, girlsCount: text })}
+              value={formData.femaleStudent}
+              onChangeText={(text) => setFormData({ ...formData, femaleStudent: text })}
               keyboardType="numeric"
-              error={errors.girlsCount}
+              error={errors.femaleStudent}
               required
             />
 
@@ -165,8 +142,8 @@ export const CreateDepartmentScreen = ({ navigation }) => {
               />
             </View>
           </SectionContainer>
-
         </ScrollView>
+
         <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
             buttons={[
@@ -184,7 +161,7 @@ export const CreateDepartmentScreen = ({ navigation }) => {
           />
         </View>
       </View>
-
+      <Toast config={ToastConfig} />
     </View>
   );
-}
+};

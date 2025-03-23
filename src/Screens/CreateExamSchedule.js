@@ -1,102 +1,156 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import { SectionContainer } from '../Components/SectionContainer';
 import styles from '../AdminPortal_Css';
 import { CustomButton } from '../Components/CustomButton';
+import GetYearlist from '../Services/ExaminationSchedule/GetYearlist';
+import GetDepartmentList from '../Services/CoursesService/GetDepartmentList';
+import GetSemesterList from '../Services/CoursesService/SemesterList';
+import GetCourseList from '../Services/CoursesService/GetCourseList';
+import axios from 'axios';
+import { API_BASE_URL } from '../Services/Config';
 
 export const CreateExamSchedule = ({ navigation }) => {
-  // Selected Department and Year State
-  const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [selectedYear, setSelectedYear] = useState('');
+  // State for dropdown options
+  const [departments, setDepartments] = useState([]);
+  const [year, setYear] = useState([]);
+  const [semesters, setSemesters] = useState([]);
+  const [course, setCourse] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Form Data State
+  const [examDate, setExamDate] = useState(new Date()); // State for examDate (initialized to current date)
+  const [showDatePicker, setShowDatePicker] = useState(false); // State to control date picker visibility
+  const [examDay, setExamDay] = useState(''); // State for examDay
   const [examSchedule, setExamSchedule] = useState([{
-    date: '',
-    day: '',
     slots: [{
       time: '',
-      course: '',
-      courseCode: '',
+      courseId: '', // Updated to courseId
       venue: ''
     }]
   }]);
 
-  // Toggle States
-  const [showDepartments, setShowDepartments] = useState(true);
-  const [showYears, setShowYears] = useState(false);
+  // Selected Dropdown Values
+  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedSemester, setSelectedSemester] = useState('');
 
   // Validation State
   const [errors, setErrors] = useState({});
 
-  // Available Departments
-  const departments = [
-    { code: 'SE', name: 'Software Engineering' },
-    { code: 'CS', name: 'Computer Science' },
-    { code: 'EE', name: 'Electrical Engineering' }
-  ];
+  // Fetch data for dropdowns
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const departmentsData = await GetDepartmentList();
+        const yearData = await GetYearlist();
+        const semestersData = await GetSemesterList();
+        const coursesData = await GetCourseList();
 
-  // Available Years
-  const years = [
-    { id: '1', name: 'First Year' },
-    { id: '2', name: 'Second Year' },
-    { id: '3', name: 'Third Year' },
-    { id: '4', name: 'Fourth Year' }
-  ];
+        // Set default values if data is undefined
+        setDepartments(departmentsData || []);
+        setYear(yearData || []);
+        setSemesters(semestersData || []);
+        setCourse(coursesData || []);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchData();
+  }, []);
+
+  // Handle date change from date picker
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(Platform.OS === 'ios'); // Hide the date picker on iOS after selection
+    if (selectedDate) {
+      setExamDate(selectedDate); // Update the examDate state
+    }
+  };
+
+  // Add a new slot to a specific day
   const handleAddSlot = (scheduleIndex) => {
     const updatedSchedule = [...examSchedule];
     updatedSchedule[scheduleIndex].slots.push({
       time: '',
-      course: '',
-      courseCode: '',
+      courseId: '', // Updated to courseId
       venue: ''
     });
     setExamSchedule(updatedSchedule);
   };
 
+  // Add a new day to the exam schedule
   const handleAddDay = () => {
     setExamSchedule([...examSchedule, {
-      date: '',
-      day: '',
       slots: [{
         time: '',
-        course: '',
-        courseCode: '',
+        courseId: '', // Updated to courseId
         venue: ''
       }]
     }]);
   };
 
+  // Remove a slot from a specific day
   const handleRemoveSlot = (scheduleIndex, slotIndex) => {
     const updatedSchedule = [...examSchedule];
     updatedSchedule[scheduleIndex].slots.splice(slotIndex, 1);
     setExamSchedule(updatedSchedule);
   };
 
+  // Remove a day from the exam schedule
   const handleRemoveDay = (scheduleIndex) => {
     const updatedSchedule = [...examSchedule];
     updatedSchedule.splice(scheduleIndex, 1);
     setExamSchedule(updatedSchedule);
   };
 
-  const handleUpdateSchedule = (scheduleIndex, field, value) => {
-    const updatedSchedule = [...examSchedule];
-    updatedSchedule[scheduleIndex][field] = value;
-    setExamSchedule(updatedSchedule);
-  };
-
+  // Update a specific field in a slot
   const handleUpdateSlot = (scheduleIndex, slotIndex, field, value) => {
     const updatedSchedule = [...examSchedule];
     updatedSchedule[scheduleIndex].slots[slotIndex][field] = value;
     setExamSchedule(updatedSchedule);
   };
 
-  return (
+  // Handle form submission
+  const handleSubmit = async () => {
+    try {
+      // Format examDate as ISO 8601 string
+      const formattedExamDate = examDate.toISOString();
 
+      const payload = {
+        examDate: formattedExamDate, // Use the formatted examDate
+        examDay: examDay, // Use the examDay state
+        yearId: parseInt(selectedYear, 10),
+        departmentID: parseInt(selectedDepartment, 10),
+        semesterID: parseInt(selectedSemester, 10),
+        examslots: examSchedule[0].slots.map(slot => ({
+          timeSlot: slot.time,
+          courseId: parseInt(slot.courseId, 10),
+          venue: slot.venue
+        }))
+      };
+
+      console.log('Payload:', payload);
+
+      // Send payload to API
+      const response = await axios.post(`${API_BASE_URL}/api/ExamSchedule/AddExamSchedule`, payload);
+      console.log('Exam schedule created successfully:', response.data);
+
+      // Navigate back or show success message
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error creating exam schedule:', error.response ? error.response.data : error.message);
+    }
+  };
+
+  return (
     <View style={styles.CreateExamSchedulemainContainer}>
       <Header />
       <CustomHeader
@@ -108,7 +162,6 @@ export const CreateExamSchedule = ({ navigation }) => {
       />
 
       <View style={styles.CreateExamSchedulecontentContainer}>
-
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.CreateExamSchedulescrollContent}
@@ -124,69 +177,77 @@ export const CreateExamSchedule = ({ navigation }) => {
               <View style={[styles.CreateExamSchedulelegendDot, styles.CreateExamScheduleoptionalDot]} />
               <Text style={styles.CreateExamSchedulelegendText}>Optional</Text>
             </View>
-          </View>        {/* Department Selection Section */}
-          <SectionContainer
-            title="Select Department"
-            expanded={showDepartments}
-            onToggle={() => setShowDepartments(!showDepartments)}
-          >
-            <View style={styles.CreateExamScheduleoptionsContainer}>
-              {departments.map((dept) => (
-                <TouchableOpacity
-                  key={dept.code}
-                  style={[
-                    styles.CreateExamScheduleoptionButton,
-                    selectedDepartment === dept.code && styles.CreateExamScheduleoptionButtonSelected
-                  ]}
-                  onPress={() => setSelectedDepartment(dept.code)}
-                >
-                  <MaterialIcons
-                    name="domain"
-                    size={24}
-                    color={selectedDepartment === dept.code ? '#FFFFFF' : '#6C63FF'}
-                  />
-                  <Text style={[
-                    styles.CreateExamScheduleoptionText,
-                    selectedDepartment === dept.code && styles.CreateExamScheduleoptionTextSelected
-                  ]}>
-                    {dept.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </SectionContainer>
+          </View>
 
-          {/* Year Selection Section */}
-          <SectionContainer
-            title="Select Year"
-            expanded={showYears}
-            onToggle={() => setShowYears(!showYears)}
-          >
-            <View style={styles.CreateExamScheduleoptionsContainer}>
-              {years.map((year) => (
-                <TouchableOpacity
-                  key={year.id}
-                  style={[
-                    styles.CreateExamScheduleoptionButton,
-                    selectedYear === year.id && styles.CreateExamScheduleoptionButtonSelected
-                  ]}
-                  onPress={() => setSelectedYear(year.id)}
-                >
-                  <MaterialIcons
-                    name="school"
-                    size={24}
-                    color={selectedYear === year.id ? '#FFFFFF' : '#6C63FF'}
-                  />
-                  <Text style={[
-                    styles.CreateExamScheduleoptionText,
-                    selectedYear === year.id && styles.CreateExamScheduleoptionTextSelected
-                  ]}>
-                    {year.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </SectionContainer>
+          {/* Exam Date Input */}
+          <View style={styles.CreateExamScheduleformGroup}>
+            <Text style={styles.CreateExamSchedulelabel}>Exam Date</Text>
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(true)}
+              style={styles.CreateExamScheduleinput}
+            >
+              <Text>{examDate.toDateString()}</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={examDate}
+                mode="date"
+                display="default"
+                onChange={handleDateChange}
+              />
+            )}
+          </View>
+
+          {/* Exam Day Input */}
+          <FormField
+            label="Exam Day"
+            placeholder="e.g., Monday"
+            value={examDay}
+            onChangeText={(text) => setExamDay(text)}
+            error={errors.examDay}
+          />
+
+          {/* Department Dropdown */}
+          <FormField
+            label="Department"
+            placeholder="Select Department"
+            type="select"
+            required
+            value={selectedDepartment}
+            onChangeText={(value) => setSelectedDepartment(value)}
+            options={departments.map(dept => ({
+              label: dept.departmentName || 'Unknown Department', // Fallback for undefined
+              value: dept.id ? dept.id.toString() : '', // Ensure id is defined
+            }))}
+          />
+
+          {/* Year Dropdown */}
+          <FormField
+            label="Year"
+            placeholder="Select Year"
+            type="select"
+            required
+            value={selectedYear}
+            onChangeText={(value) => setSelectedYear(value)}
+            options={year.map(y => ({
+              label: y.yearName || 'Unknown Year', // Fallback for undefined
+              value: y.yearId ? y.yearId.toString() : '', // Ensure id is defined
+            }))}
+          />
+
+          {/* Semester Dropdown */}
+          <FormField
+            label="Semester"
+            placeholder="Select Semester"
+            type="select"
+            required
+            value={selectedSemester}
+            onChangeText={(value) => setSelectedSemester(value)}
+            options={semesters.map(sem => ({
+              label: sem.semesterName || 'Unknown Semester', // Fallback for undefined
+              value: sem.id ? sem.id.toString() : '', // Ensure id is defined
+            }))}
+          />
 
           {/* Exam Schedule Section */}
           <SectionContainer title="Exam Schedule">
@@ -202,26 +263,6 @@ export const CreateExamSchedule = ({ navigation }) => {
                       <MaterialIcons name="remove-circle" size={24} color="#EF4444" />
                     </TouchableOpacity>
                   )}
-                </View>
-
-                <View style={styles.CreateExamScheduleformGroup}>
-                  <Text style={styles.CreateExamSchedulelabel}>Date</Text>
-                  <FormField
-                    value={schedule.date}
-                    onChangeText={(text) => handleUpdateSchedule(scheduleIndex, 'date', text)}
-                    placeholder="YYYY-MM-DD"
-                    error={errors[`schedule_${scheduleIndex}_date`]}
-                  />
-                </View>
-
-                <View style={styles.CreateExamScheduleformGroup}>
-                  <Text style={styles.CreateExamSchedulelabel}>Day</Text>
-                  <FormField
-                    value={schedule.day}
-                    onChangeText={(text) => handleUpdateSchedule(scheduleIndex, 'day', text)}
-                    placeholder="e.g., Monday"
-                    error={errors[`schedule_${scheduleIndex}_day`]}
-                  />
                 </View>
 
                 {schedule.slots.map((slot, slotIndex) => (
@@ -249,22 +290,18 @@ export const CreateExamSchedule = ({ navigation }) => {
                     </View>
 
                     <View style={styles.CreateExamScheduleformGroup}>
-                      <Text style={styles.CreateExamSchedulelabel}>Course Code</Text>
+                      <Text style={styles.CreateExamSchedulelabel}>Course</Text>
                       <FormField
-                        value={slot.courseCode}
-                        onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'courseCode', text)}
-                        placeholder="e.g., CS101"
-                        error={errors[`slot_${scheduleIndex}_${slotIndex}_code`]}
-                      />
-                    </View>
-
-                    <View style={styles.CreateExamScheduleformGroup}>
-                      <Text style={styles.CreateExamSchedulelabel}>Course Name</Text>
-                      <FormField
-                        value={slot.course}
-                        onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'course', text)}
-                        placeholder="e.g., Programming Fundamentals"
-                        error={errors[`slot_${scheduleIndex}_${slotIndex}_course`]}
+                        label="Course"
+                        placeholder="Select Course"
+                        type="select"
+                        required
+                        value={slot.courseId}
+                        onChangeText={(value) => handleUpdateSlot(scheduleIndex, slotIndex, 'courseId', value)}
+                        options={course.map(c => ({
+                          label: c.name || 'Unknown Course', // Fallback for undefined
+                          value: c.id ? c.id.toString() : '', // Ensure id is defined
+                        }))}
                       />
                     </View>
 
@@ -298,9 +335,8 @@ export const CreateExamSchedule = ({ navigation }) => {
               <Text style={styles.CreateExamScheduleaddButtonText}>Add Day</Text>
             </TouchableOpacity>
           </SectionContainer>
-
-
         </ScrollView>
+
         <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
             buttons={[
@@ -311,16 +347,13 @@ export const CreateExamSchedule = ({ navigation }) => {
               },
               {
                 title: "Create Schedule",
-                onPress: handleUpdateSchedule,
+                onPress: handleSubmit,
                 variant: "primary",
               }
             ]}
           />
         </View>
-
       </View>
     </View>
-
   );
 };
-
