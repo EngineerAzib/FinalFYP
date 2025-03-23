@@ -7,31 +7,34 @@ import { SectionContainer } from '../Components/SectionContainer';
 import styles from '../AdminPortal_Css';
 import { CustomButton } from '../Components/CustomButton';
 
-const AddStudentForm = ({ navigation }) => {
+const CreateTeacherForm = ({ navigation }) => {
+  // Initialize form state with teacher-specific fields
   const [formData, setFormData] = useState({
-    studentName: '',
-    fatherName: '',
-    rollNo: '',
-    enrollmentNo: '',
+    teacherName: '',
+    qualification: '',
+    employeeId: '',
     department: '',
     profilePhoto: '',
     dateOfBirth: '',
-    semesterNo: '',
+    specialization: '',
     cnicNo: '',
     phoneNo: '',
+    email: '',
+    designation: '',
+    joiningDate: '',
   });
 
   const handleSubmit = async () => {
-    console.log('Student Data:', formData);
-    // TODO: Implement API call to save student
+    console.log('Teacher Data:', formData);
+    // TODO: Implement API call to save teacher
   };
 
   return (
     <View style={styles.EditDepartmentScreenmainContainer}>
       <Header />
       <CustomHeader
-        title="Students"
-        currentScreen="Student Registration"
+        title="Teachers"
+        currentScreen="Teacher Registration"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
@@ -42,7 +45,7 @@ const AddStudentForm = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.EditDepartmentScreenscrollContent}
         >
-          <Text style={styles.AddStudentFormformTitle}>Add New Student</Text>
+          <Text style={styles.AddStudentFormformTitle}>Add New Teacher</Text>
 
           <View style={styles.AddStudentFormlegendContainer}>
             <View style={styles.AddStudentFormlegendItem}>
@@ -55,68 +58,49 @@ const AddStudentForm = ({ navigation }) => {
             </View>
           </View>
 
-          <SectionContainer sectionNumber="1" title="Student Information">
+          <SectionContainer sectionNumber="1" title="Teacher Information">
             <FormField
-              label="Student Name"
-              placeholder="Enter student's name"
+              label="Teacher Name"
+              placeholder="Enter teacher's name"
               required
-              value={formData.studentName}
-              onChangeText={(text) => setFormData({ ...formData, studentName: text })}
+              value={formData.teacherName}
+              onChangeText={(text) => setFormData({ ...formData, teacherName: text })}
               editable={true}
               autoCapitalize="none"
               autoCorrect={false}
               spellCheck={false}
               enablesReturnKeyAutomatically
               returnKeyType="done"
-              // Critical for Android
               blurOnSubmit={false}
             />
 
             <FormField
-              label="Father Name"
-              placeholder="Enter father's name"
+              label="Qualification"
+              placeholder="Enter highest qualification"
               required
-              value={formData.fatherName}
-              onChangeText={(text) => setFormData({ ...formData, fatherName: text })}
+              value={formData.qualification}
+              onChangeText={(text) => setFormData({ ...formData, qualification: text })}
               editable={true}
               autoCapitalize="none"
               autoCorrect={false}
               spellCheck={false}
               enablesReturnKeyAutomatically
               returnKeyType="done"
-              // Critical for Android
               blurOnSubmit={false}
             />
 
             <FormField
-              label="Roll No"
-              placeholder="Enter student roll number"
+              label="Employee ID"
+              placeholder="Enter employee ID"
               required
-              value={formData.rollNo}
-              onChangeText={(text) => setFormData({ ...formData, rollNo: text })}
+              value={formData.employeeId}
+              onChangeText={(text) => setFormData({ ...formData, employeeId: text })}
               editable={true}
               autoCapitalize="none"
               autoCorrect={false}
               spellCheck={false}
               enablesReturnKeyAutomatically
               returnKeyType="done"
-              // Critical for Android
-              blurOnSubmit={false}
-            />
-
-            <FormField
-              label="Enrollment No"
-              placeholder="Enter student enrollment number"
-              required
-              value={formData.enrollmentNo}
-              onChangeText={(text) => setFormData({ ...formData, enrollmentNo: text })}
-              editable={true}
-              autoCapitalize="none"
-              autoCorrect={false}
-              spellCheck={false}
-              enablesReturnKeyAutomatically
-              returnKeyType="done"
-              // Critical for Android
               blurOnSubmit={false}
             />
 
@@ -133,7 +117,36 @@ const AddStudentForm = ({ navigation }) => {
               spellCheck={false}
               enablesReturnKeyAutomatically
               returnKeyType="done"
-              // Critical for Android
+              blurOnSubmit={false}
+            />
+
+            <FormField
+              label="Designation"
+              placeholder="Enter designation"
+              required
+              value={formData.designation}
+              onChangeText={(text) => setFormData({ ...formData, designation: text })}
+              editable={true}
+              autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
+              enablesReturnKeyAutomatically
+              returnKeyType="done"
+              blurOnSubmit={false}
+            />
+
+            <FormField
+              label="Specialization"
+              placeholder="Enter specialization"
+              required
+              value={formData.specialization}
+              onChangeText={(text) => setFormData({ ...formData, specialization: text })}
+              editable={true}
+              autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
+              enablesReturnKeyAutomatically
+              returnKeyType="done"
               blurOnSubmit={false}
             />
 
@@ -150,24 +163,22 @@ const AddStudentForm = ({ navigation }) => {
               spellCheck={false}
               enablesReturnKeyAutomatically
               returnKeyType="done"
-              // Critical for Android
               blurOnSubmit={false}
             />
 
             <FormField
-              label="Semester No"
-              placeholder="Enter current semester"
+              label="Joining Date"
+              placeholder="Select Date"
+              type="date"
               required
-              value={formData.semesterNo}
-              onChangeText={(text) => setFormData({ ...formData, semesterNo: text })}
-              keyboardType="numeric"
+              value={formData.joiningDate}
+              onChangeText={(text) => setFormData({ ...formData, joiningDate: text })}
               editable={true}
               autoCapitalize="none"
               autoCorrect={false}
               spellCheck={false}
               enablesReturnKeyAutomatically
               returnKeyType="done"
-              // Critical for Android
               blurOnSubmit={false}
             />
 
@@ -184,13 +195,13 @@ const AddStudentForm = ({ navigation }) => {
               spellCheck={false}
               enablesReturnKeyAutomatically
               returnKeyType="done"
-              // Critical for Android
               blurOnSubmit={false}
             />
 
             <FormField
               label="Phone No"
               placeholder="e.g +44xxxxxxxxxx"
+              required
               value={formData.phoneNo}
               onChangeText={(text) => setFormData({ ...formData, phoneNo: text })}
               keyboardType="phone-pad"
@@ -200,18 +211,32 @@ const AddStudentForm = ({ navigation }) => {
               spellCheck={false}
               enablesReturnKeyAutomatically
               returnKeyType="done"
-              // Critical for Android
+              blurOnSubmit={false}
+            />
+
+            <FormField
+              label="Email"
+              placeholder="Enter email address"
+              required
+              value={formData.email}
+              onChangeText={(text) => setFormData({ ...formData, email: text })}
+              keyboardType="email-address"
+              editable={true}
+              autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
+              enablesReturnKeyAutomatically
+              returnKeyType="done"
               blurOnSubmit={false}
             />
           </SectionContainer>
         </ScrollView>
 
-        {/* ✅ Fixed Button Placement */}
         <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
             buttons={[
               { title: "Cancel", onPress: () => navigation.goBack(), variant: "secondary" },
-              { title: "Register Student", onPress: handleSubmit, variant: "primary" },
+              { title: "Register Teacher", onPress: handleSubmit, variant: "primary" },
             ]}
           />
         </View>
@@ -220,4 +245,4 @@ const AddStudentForm = ({ navigation }) => {
   );
 };
 
-export default AddStudentForm;
+export default CreateTeacherForm;

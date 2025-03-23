@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import CustomMenuDrawer from './CustomMenuDrawer';
 import styles from '../AdminPortal_Css';
+import { NotificationScreen } from '../Screens/NotificationScreen';
 
 export const Header = () => {
   const navigation = useNavigation();
@@ -74,7 +75,7 @@ export const Header = () => {
 
           {/* Logo Section */}
           <View style={styles.HeaderlogoContainer}>
-            <Text style={styles.HeaderlogoText}>eSkooly</Text>
+            <Text style={styles.HeaderlogoText}>Asaan Campus</Text>
           </View>
 
           {/* Right Icons Section */}
@@ -85,7 +86,7 @@ export const Header = () => {
                 style={styles.HeadericonButton}
                 onPress={() => {
                   animateBell();
-                  navigation.navigate('NotificationsScreen');
+                  navigation.navigate('NotificationScreen');
                 }}
               >
                 <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
@@ -101,7 +102,7 @@ export const Header = () => {
               onPress={() => navigation.navigate('AdminProfile')}
             >
               <Image
-                source={require('../Assets/profileicon.png')} // Make sure to update this path
+                source={require('../Assets/profileicon.png')} 
                 style={styles.HeaderprofileImage}
               />
             </TouchableOpacity>

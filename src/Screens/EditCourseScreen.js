@@ -41,11 +41,21 @@ export const EditCourseScreen = ({ department, route, navigation }) => {
   };
 
   return (
-    <View style={styles.EditCourseScreencontainer}>
+    <View style={styles.EditCourseScreenmainContainer}>
       <Header />
-      <EnhancedCustomHeader />
-      <ScrollView style={styles.EditCourseScreenscrollView}>
-        <View style={styles.EditCourseScreencontentContainer}>
+      <CustomHeader
+        title="Courses"
+        currentScreen="Edit Course"
+        showSearch={false}
+        showRefresh={false}
+        navigation={navigation}
+      />
+
+      <View style={styles.EditCourseScreencontentContainer}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.EditCourseScreenscrollContent}
+        >
           <Text style={styles.EditCourseScreenformTitle}>Edit Course</Text>
 
           <View style={styles.EditCourseScreenlegendContainer}>
@@ -99,19 +109,29 @@ export const EditCourseScreen = ({ department, route, navigation }) => {
 
 
           </SectionContainer>
-          <View style={styles.EditDepartmentScreenbuttonContainer}>
+
+
+
+        </ScrollView>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
             <CustomButton
-              title="Update Course"
-              onPress={handleUpdate}
-              variant="primary"
-              fullWidth
-              icon={<MaterialIcons name="check" size={24} color="white" />} 
+              buttons={[
+                {
+                  title: "Cancel",
+                  onPress: () => navigation.goBack(),
+                  variant: "secondary",
+                },
+                {
+                  title: "Edit Course",
+                  onPress: handleUpdate,
+                  variant: "primary",
+                }
+              ]}
             />
           </View>
-
-        </View>
-      </ScrollView>
+      </View>
     </View>
+
   );
 };
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import styles from '../AdminPortal_Css';
 import { SectionContainer } from '../Components/SectionContainer';
+import { CustomButton } from '../Components/CustomButton';
 
 export const EditSemesterRegistration = ({ route, navigation }) => {
   const { deptCode, semesterNumber, semesterData } = route.params;
@@ -26,7 +27,6 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
 
   const handleSaveChanges = () => {
-    // Validate the data
     if (!registrationData.semester || !registrationData.registrationDeadline || !registrationData.startDate) {
       Alert.alert('Validation Error', 'Please fill in all semester details');
       return;
@@ -197,31 +197,30 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
   );
 
   return (
-    <View style={styles.EditSemesterRegistrationcontainer}>
+    <View style={{ flex: 1 }}>
       <Header />
       <CustomHeader
-        title={`Edit ${registrationData.semester}`}
-        currentScreen="Edit Registration"
+        title="Semester Registration"
+        currentScreen="Edit Reg_"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
-      <ScrollView >
-        <View style={styles.EditSemesterRegistrationcontentContainer}>
-          <Text style={styles.EditSemesterRegistrationformTitle}>Edit Semester Registration</Text>
 
-          <View style={styles.EditSemesterRegistrationlegendContainer}>
-            <View style={styles.EditSemesterRegistrationlegendItem}>
-              <View style={[styles.EditSemesterRegistrationlegendDot, styles.EditSemesterRegistrationrequiredDot]} />
-              <Text style={styles.EditSemesterRegistrationlegendText}>Required*</Text>
-            </View>
-            <View style={styles.EditSemesterRegistrationlegendItem}>
-              <View style={[styles.EditSemesterRegistrationlegendDot, styles.EditSemesterRegistrationoptionalDot]} />
-              <Text style={styles.EditSemesterRegistrationlegendText}>Optional</Text>
-            </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.EditSemesterRegistrationheaderInfo}>
+          <View style={styles.EditSemesterRegistrationinfoItem}>
+            <MaterialIcons name="domain" size={24} color="#6C63FF" />
+            <Text style={styles.EditSemesterRegistrationinfoText}>{semesterData?.name || deptCode}</Text>
           </View>
-          <SectionContainer sectionNumber="1" title="Edit Registeration">
+          <View style={styles.EditSemesterRegistrationinfoItem}>
+            <MaterialIcons name="school" size={24} color="#6C63FF" />
+            <Text style={styles.EditSemesterRegistrationinfoText}>{semesterData?.semester}</Text>
+          </View>
+        </View>
 
+        <View style={styles.EditSemesterRegistrationcontentContainer}>
+          <SectionContainer title="Edit Semester Registration">
             <View style={styles.EditSemesterRegistrationInfoContainer}>
               <Text style={styles.EditSemesterRegistrationsectionTitle}>Semester Information</Text>
               <TouchableOpacity
@@ -255,15 +254,20 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
           </SectionContainer>
-
         </View>
-
       </ScrollView>
 
-      <TouchableOpacity style={styles.EditSemesterRegistrationsaveButton} onPress={handleSaveChanges}>
-        <Text style={styles.EditSemesterRegistrationsaveButtonText}>Save Changes</Text>
-      </TouchableOpacity>
+      {/* Footer */}
+      <View style={styles.CreateExamSchedulebuttonContainer}>
+        <CustomButton
+          buttons={[
+            { title: "Cancel", onPress: () => navigation.goBack(), variant: "secondary" },
+            { title: "Edit Registeration", onPress: handleSaveChanges, variant: "primary" }
+          ]}
+        />
+      </View>
 
+      {/* Date Pickers */}
       {(showDeadlinePicker || showStartDatePicker) && (
         <DateTimePicker
           value={showDeadlinePicker ? registrationData.registrationDeadline : registrationData.startDate}
@@ -286,5 +290,3 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
     </View>
   );
 };
-
-

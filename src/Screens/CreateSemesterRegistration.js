@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import styles from '../AdminPortal_Css';
 import { SectionContainer } from '../Components/SectionContainer';
 import { FormField } from '../Components/FormField';
+import { CustomButton } from '../Components/CustomButton';
 
 const CreateSemesterRegistration = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -22,7 +23,8 @@ const CreateSemesterRegistration = ({ navigation }) => {
       instructor: '',
       labInstructor: '',
       maxStudents: '',
-      prerequisites: []
+      prerequisites: [],
+      showPrereqInput: false
     }]
   });
 
@@ -39,7 +41,8 @@ const CreateSemesterRegistration = ({ navigation }) => {
         instructor: '',
         labInstructor: '',
         maxStudents: '',
-        prerequisites: []
+        prerequisites: [],
+        showPrereqInput: false
       }]
     }));
   };
@@ -51,6 +54,17 @@ const CreateSemesterRegistration = ({ navigation }) => {
     }));
   };
 
+  const togglePrerequisiteInput = (courseIndex) => {
+    setFormData(prev => {
+      const newCourses = [...prev.courses];
+      newCourses[courseIndex] = {
+        ...newCourses[courseIndex],
+        showPrereqInput: !newCourses[courseIndex].showPrereqInput
+      };
+      return { ...prev, courses: newCourses };
+    });
+  };
+
   const addPrerequisite = (courseIndex) => {
     if (currentPrereq.trim()) {
       setFormData(prev => {
@@ -59,6 +73,7 @@ const CreateSemesterRegistration = ({ navigation }) => {
           ...newCourses[courseIndex].prerequisites,
           currentPrereq.trim()
         ];
+        newCourses[courseIndex].showPrereqInput = false; // Hide input after adding
         return { ...prev, courses: newCourses };
       });
       setCurrentPrereq('');
@@ -83,18 +98,22 @@ const CreateSemesterRegistration = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.CreateSemesterRegistrationcontainer}>
+    <View style={styles.CreateSemesterRegistrationmainContainer}>
       <Header />
       <CustomHeader
         title="Semester Registration"
-        currentScreen="Create Reg_"
+        currentScreen="Add Registeration"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
-      <ScrollView >
-        <View style={styles.CreateSemesterRegistrationcontentContainer}>
-          <Text style={styles.CreateSemesterRegistrationformTitle}>Create Internship</Text>
+
+      <View style={styles.CreateSemesterRegistrationcontentContainer}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.CreateSemesterRegistrationscrollContent}
+        >
+          <Text style={styles.CreateSemesterRegistrationformTitle}>Create Semester Registration</Text>
 
           <View style={styles.CreateSemesterRegistrationlegendContainer}>
             <View style={styles.CreateSemesterRegistrationlegendItem}>
@@ -105,7 +124,8 @@ const CreateSemesterRegistration = ({ navigation }) => {
               <View style={[styles.CreateSemesterRegistrationlegendDot, styles.CreateSemesterRegistrationoptionalDot]} />
               <Text style={styles.CreateSemesterRegistrationlegendText}>Optional</Text>
             </View>
-          </View>        {/* Basic Information Section using SectionContainer */}
+          </View>
+
           <SectionContainer
             title="Basic Information"
             icon={<MaterialIcons name="info" size={24} color="#6C63FF" />}
@@ -143,7 +163,6 @@ const CreateSemesterRegistration = ({ navigation }) => {
             />
           </SectionContainer>
 
-          {/* Courses Section using SectionContainer */}
           <SectionContainer
             title="Courses"
             icon={<MaterialIcons name="book" size={24} color="#6C63FF" />}
@@ -182,7 +201,6 @@ const CreateSemesterRegistration = ({ navigation }) => {
                   keyboardType="numeric"
                 />
 
-                {/* Course Type Selection */}
                 <View style={styles.CreateSemesterRegistrationinputGroup}>
                   <Text style={styles.CreateSemesterRegistrationlabel}>Course Type</Text>
                   <View style={styles.CreateSemesterRegistrationtypeContainer}>
@@ -230,7 +248,6 @@ const CreateSemesterRegistration = ({ navigation }) => {
                   keyboardType="numeric"
                 />
 
-                {/* Prerequisites Section */}
                 <View style={styles.CreateSemesterRegistrationinputGroup}>
                   <Text style={styles.CreateSemesterRegistrationlabel}>Prerequisites</Text>
                   <View style={styles.CreateSemesterRegistrationprerequisitesContainer}>
@@ -246,20 +263,33 @@ const CreateSemesterRegistration = ({ navigation }) => {
                       </View>
                     ))}
                   </View>
-                  <View style={styles.CreateSemesterRegistrationaddPrereqContainer}>
-                    <FormField
-                      value={currentPrereq}
-                      onChangeText={setCurrentPrereq}
-                      placeholder="Enter prerequisite course code"
-                      containerStyle={styles.CreateSemesterRegistrationprereqInput}
-                    />
-                    <TouchableOpacity
-                      style={styles.CreateSemesterRegistrationaddPrereqButton}
-                      onPress={() => addPrerequisite(index)}
-                    >
-                      <MaterialIcons name="add" size={24} color="#6C63FF" />
-                    </TouchableOpacity>
-                  </View>
+
+                  {/* Prerequisite Add Button */}
+                  <TouchableOpacity
+                    style={styles.CreateSemesterRegistrationaddPrereqButton}
+                    onPress={() => togglePrerequisiteInput(index)}
+                  >
+                    <MaterialIcons name="add" size={24} color="#6C63FF" />
+                    <Text style={styles.CreateSemesterRegistrationaddPrereqButtonText}>Add Prerequisite</Text>
+                  </TouchableOpacity>
+
+                  {/* Conditional Prerequisite Input */}
+                  {course.showPrereqInput && (
+                    <View style={styles.CreateSemesterRegistrationaddPrereqContainer}>
+                      <FormField
+                        value={currentPrereq}
+                        onChangeText={setCurrentPrereq}
+                        placeholder="Enter prerequisite course code"
+                        containerStyle={styles.CreateSemesterRegistrationprereqInput}
+                      />
+                      <TouchableOpacity
+                        style={styles.CreateSemesterRegistrationaddPrereqButton}
+                        onPress={() => addPrerequisite(index)}
+                      >
+                        <MaterialIcons name="check" size={24} color="#6C63FF" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
               </View>
             ))}
@@ -272,22 +302,27 @@ const CreateSemesterRegistration = ({ navigation }) => {
               <Text style={styles.CreateSemesterRegistrationaddCourseButtonText}>Add Another Course</Text>
             </TouchableOpacity>
           </SectionContainer>
+        </ScrollView>
 
-          <TouchableOpacity
-            style={styles.CreateSemesterRegistrationsubmitButton}
-            onPress={() => {
-              console.log('Form Data:', formData);
-            }}
-          >
-            <Text style={styles.CreateSemesterRegistrationsubmitButtonText}>Create Registration</Text>
-          </TouchableOpacity>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+          <CustomButton
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Create Registeration",
+                onPress: updateCourseField,
+                variant: "primary",
+              }
+            ]}
+          />
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
-
-
-
 
 export default CreateSemesterRegistration;

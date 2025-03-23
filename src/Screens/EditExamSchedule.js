@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
-import { Button } from '../Components/Button';
+import { CustomButton } from '../Components/CustomButton';
 import { SectionContainer } from '../Components/SectionContainer';
 import styles from '../AdminPortal_Css';
 
@@ -24,6 +24,18 @@ export const EditExamSchedule = ({ route, navigation }) => {
         ...schedule,
         slots: [...schedule.slots]
       })));
+    } else {
+      // If no existing schedule, add a default day
+      setExamSchedule([{
+        date: '',
+        day: '',
+        slots: [{
+          time: '',
+          course: '',
+          courseCode: '',
+          venue: ''
+        }]
+      }]);
     }
   }, [yearData]);
 
@@ -142,7 +154,8 @@ export const EditExamSchedule = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.EditExamSchedulecontainer}>
+
+    <View style={styles.CreateSemesterRegistrationmainContainer}>
       <Header />
       <CustomHeader
         title="Exam Schedule"
@@ -152,145 +165,152 @@ export const EditExamSchedule = ({ route, navigation }) => {
         navigation={navigation}
       />
 
-      <ScrollView >
-        <View style={styles.EditExamScheduleheaderInfo}>
-          <View style={styles.EditExamScheduleinfoItem}>
-            <MaterialIcons name="domain" size={24} color="#6C63FF" />
-            <Text style={styles.EditExamScheduleinfoText}>{yearData?.name || deptCode}</Text>
-          </View>
-          <View style={styles.EditExamScheduleinfoItem}>
-            <MaterialIcons name="school" size={24} color="#6C63FF" />
-            <Text style={styles.EditExamScheduleinfoText}>{yearData?.year}</Text>
-          </View>
-        </View>
+      <View style={styles.CreateSemesterRegistrationcontentContainer}>
 
-        <SectionContainer title="Edit Exam Schedule">
-          {examSchedule.map((schedule, scheduleIndex) => (
-            <View key={scheduleIndex} style={styles.EditExamSchedulescheduleContainer}>
-              <View style={styles.EditExamScheduledayHeader}>
-                <Text style={styles.EditExamScheduledayTitle}>Day {scheduleIndex + 1}</Text>
-                {scheduleIndex > 0 && (
-                  <TouchableOpacity
-                    onPress={() => handleRemoveDay(scheduleIndex)}
-                    style={styles.EditExamScheduleremoveButton}
-                  >
-                    <MaterialIcons name="remove-circle" size={24} color="#EF4444" />
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              <View style={styles.EditExamScheduleformGroup}>
-                <Text style={styles.EditExamSchedulelabel}>Date</Text>
-                <FormField
-                  value={schedule.date}
-                  onChangeText={(text) => handleUpdateSchedule(scheduleIndex, 'date', text)}
-                  placeholder="YYYY-MM-DD"
-                  error={errors[`schedule_${scheduleIndex}_date`]}
-                />
-              </View>
-
-              <View style={styles.EditExamScheduleformGroup}>
-                <Text style={styles.EditExamSchedulelabel}>Day</Text>
-                <FormField
-                  value={schedule.day}
-                  onChangeText={(text) => handleUpdateSchedule(scheduleIndex, 'day', text)}
-                  placeholder="e.g., Monday"
-                  error={errors[`schedule_${scheduleIndex}_day`]}
-                />
-              </View>
-
-              {schedule.slots.map((slot, slotIndex) => (
-                <View key={slotIndex} style={styles.EditExamScheduleslotContainer}>
-                  <View style={styles.EditExamScheduleslotHeader}>
-                    <Text style={styles.EditExamScheduleslotTitle}>Slot {slotIndex + 1}</Text>
-                    {slotIndex > 0 && (
-                      <TouchableOpacity
-                        onPress={() => handleRemoveSlot(scheduleIndex, slotIndex)}
-                        style={styles.EditExamScheduleremoveButton}
-                      >
-                        <MaterialIcons name="remove-circle" size={24} color="#EF4444" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-
-                  <View style={styles.EditExamScheduleformGroup}>
-                    <Text style={styles.EditExamSchedulelabel}>Time</Text>
-                    <FormField
-                      value={slot.time}
-                      onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'time', text)}
-                      placeholder="e.g., 09:00 AM - 12:00 PM"
-                      error={errors[`slot_${scheduleIndex}_${slotIndex}_time`]}
-                    />
-                  </View>
-
-                  <View style={styles.EditExamScheduleformGroup}>
-                    <Text style={styles.EditExamSchedulelabel}>Course Code</Text>
-                    <FormField
-                      value={slot.courseCode}
-                      onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'courseCode', text)}
-                      placeholder="e.g., CS101"
-                      error={errors[`slot_${scheduleIndex}_${slotIndex}_code`]}
-                    />
-                  </View>
-
-                  <View style={styles.EditExamScheduleformGroup}>
-                    <Text style={styles.EditExamSchedulelabel}>Course Name</Text>
-                    <FormField
-                      value={slot.course}
-                      onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'course', text)}
-                      placeholder="e.g., Programming Fundamentals"
-                      error={errors[`slot_${scheduleIndex}_${slotIndex}_course`]}
-                    />
-                  </View>
-
-                  <View style={styles.EditExamScheduleformGroup}>
-                    <Text style={styles.EditExamSchedulelabel}>Venue</Text>
-                    <FormField
-                      value={slot.venue}
-                      onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'venue', text)}
-                      placeholder="e.g., Block A - Room 101"
-                      error={errors[`slot_${scheduleIndex}_${slotIndex}_venue`]}
-                    />
-                  </View>
-                </View>
-              ))}
-
-              <TouchableOpacity
-                style={styles.EditExamScheduleaddButton}
-                onPress={() => handleAddSlot(scheduleIndex)}
-              >
-                <MaterialIcons name="add-circle" size={24} color="#6C63FF" />
-                <Text style={styles.EditExamScheduleaddButtonText}>Add Slot</Text>
-              </TouchableOpacity>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.CreateSemesterRegistrationscrollContent}
+        >
+          <View style={styles.EditExamScheduleheaderInfo}>
+            <View style={styles.EditExamScheduleinfoItem}>
+              <MaterialIcons name="domain" size={24} color="#6C63FF" />
+              <Text style={styles.EditExamScheduleinfoText}>{yearData?.name || deptCode}</Text>
             </View>
-          ))}
+            <View style={styles.EditExamScheduleinfoItem}>
+              <MaterialIcons name="school" size={24} color="#6C63FF" />
+              <Text style={styles.EditExamScheduleinfoText}>{yearData?.year}</Text>
+            </View>
+          </View>
 
-          <TouchableOpacity
-            style={styles.EditExamScheduleaddButton}
-            onPress={handleAddDay}
-          >
-            <MaterialIcons name="add-circle" size={24} color="#6C63FF" />
-            <Text style={styles.EditExamScheduleaddButtonText}>Add Day</Text>
-          </TouchableOpacity>
-        </SectionContainer>
+          <SectionContainer title="Edit Exam Schedule">
+            {examSchedule.map((schedule, scheduleIndex) => (
+              <View key={scheduleIndex} style={styles.EditExamSchedulescheduleContainer}>
+                <View style={styles.EditExamScheduledayHeader}>
+                  <Text style={styles.EditExamScheduledayTitle}>Day {scheduleIndex + 1}</Text>
+                  {examSchedule.length > 1 && (
+                    <TouchableOpacity
+                      onPress={() => handleRemoveDay(scheduleIndex)}
+                      style={styles.EditExamScheduleremoveButton}
+                    >
+                      <MaterialIcons name="remove-circle" size={24} color="#EF4444" />
+                    </TouchableOpacity>
+                  )}
+                </View>
 
-        <View style={styles.EditExamSchedulebuttonContainer}>
-          <Button
-            title="Cancel"
-            onPress={() => navigation.goBack()}
-            variant="secondary"
-            style={styles.EditExamSchedulebutton}
-          />
-          <Button
-            title="Save Changes"
-            onPress={handleSave}
-            variant="primary"
-            style={styles.EditExamSchedulebutton}
-            disabled={!isModified}
+                <View style={styles.EditExamScheduleformGroup}>
+                  <Text style={styles.EditExamSchedulelabel}>Date</Text>
+                  <FormField
+                    value={schedule.date}
+                    onChangeText={(text) => handleUpdateSchedule(scheduleIndex, 'date', text)}
+                    placeholder="YYYY-MM-DD"
+                    error={errors[`schedule_${scheduleIndex}_date`]}
+                  />
+                </View>
+
+                <View style={styles.EditExamScheduleformGroup}>
+                  <Text style={styles.EditExamSchedulelabel}>Day</Text>
+                  <FormField
+                    value={schedule.day}
+                    onChangeText={(text) => handleUpdateSchedule(scheduleIndex, 'day', text)}
+                    placeholder="e.g., Monday"
+                    error={errors[`schedule_${scheduleIndex}_day`]}
+                  />
+                </View>
+
+                {schedule.slots.map((slot, slotIndex) => (
+                  <View key={slotIndex} style={styles.EditExamScheduleslotContainer}>
+                    <View style={styles.EditExamScheduleslotHeader}>
+                      <Text style={styles.EditExamScheduleslotTitle}>Slot {slotIndex + 1}</Text>
+                      {schedule.slots.length > 1 && (
+                        <TouchableOpacity
+                          onPress={() => handleRemoveSlot(scheduleIndex, slotIndex)}
+                          style={styles.EditExamScheduleremoveButton}
+                        >
+                          <MaterialIcons name="remove-circle" size={24} color="#EF4444" />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+
+                    <View style={styles.EditExamScheduleformGroup}>
+                      <Text style={styles.EditExamSchedulelabel}>Time</Text>
+                      <FormField
+                        value={slot.time}
+                        onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'time', text)}
+                        placeholder="e.g., 09:00 AM - 12:00 PM"
+                        error={errors[`slot_${scheduleIndex}_${slotIndex}_time`]}
+                      />
+                    </View>
+
+                    <View style={styles.EditExamScheduleformGroup}>
+                      <Text style={styles.EditExamSchedulelabel}>Course Code</Text>
+                      <FormField
+                        value={slot.courseCode}
+                        onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'courseCode', text)}
+                        placeholder="e.g., CS101"
+                        error={errors[`slot_${scheduleIndex}_${slotIndex}_code`]}
+                      />
+                    </View>
+
+                    <View style={styles.EditExamScheduleformGroup}>
+                      <Text style={styles.EditExamSchedulelabel}>Course Name</Text>
+                      <FormField
+                        value={slot.course}
+                        onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'course', text)}
+                        placeholder="e.g., Programming Fundamentals"
+                        error={errors[`slot_${scheduleIndex}_${slotIndex}_course`]}
+                      />
+                    </View>
+
+                    <View style={styles.EditExamScheduleformGroup}>
+                      <Text style={styles.EditExamSchedulelabel}>Venue</Text>
+                      <FormField
+                        value={slot.venue}
+                        onChangeText={(text) => handleUpdateSlot(scheduleIndex, slotIndex, 'venue', text)}
+                        placeholder="e.g., Block A - Room 101"
+                        error={errors[`slot_${scheduleIndex}_${slotIndex}_venue`]}
+                      />
+                    </View>
+                  </View>
+                ))}
+
+                <TouchableOpacity
+                  style={styles.EditExamScheduleaddButton}
+                  onPress={() => handleAddSlot(scheduleIndex)}
+                >
+                  <MaterialIcons name="add-circle" size={24} color="#6C63FF" />
+                  <Text style={styles.EditExamScheduleaddButtonText}>Add Slot</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+
+            <TouchableOpacity
+              style={styles.EditExamScheduleaddButton}
+              onPress={handleAddDay}
+            >
+              <MaterialIcons name="add-circle" size={24} color="#6C63FF" />
+              <Text style={styles.EditExamScheduleaddButtonText}>Add Day</Text>
+            </TouchableOpacity>
+          </SectionContainer>
+        </ScrollView>
+
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+          <CustomButton
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Edit Schedule",
+                onPress: handleSave,
+                variant: "primary",
+              }
+            ]}
           />
         </View>
-      </ScrollView>
+      </View>
     </View>
+
   );
 };
-

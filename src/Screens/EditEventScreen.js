@@ -8,6 +8,7 @@ import { FormField } from '../Components/FormField';
 import { EventCard } from '../Components/EventCard';
 import styles from '../AdminPortal_Css';
 import { SectionContainer } from '../Components/SectionContainer';
+import { CustomButton } from '../Components/CustomButton';
 
 
 export const EditEventScreen = ({ route, navigation }) => {
@@ -59,7 +60,8 @@ export const EditEventScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.EditEventScreencontainer}>
+
+    <View style={styles.EditEventScreenmainContainer}>
       <Header />
       <CustomHeader
         title="Events"
@@ -68,8 +70,13 @@ export const EditEventScreen = ({ route, navigation }) => {
         showRefresh={false}
         navigation={navigation}
       />
-      <ScrollView style={styles.EditEventScreenscrollView}>
-        <View style={styles.EditEventScreencontentContainer}>
+
+      <View style={styles.EditEventScreencontentContainer}>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.EditEventScreenscrollContent}
+        >
           <Text style={styles.EditEventScreenformTitle}>Edit Event</Text>
 
           <View style={styles.EditEventScreenlegendContainer}>
@@ -177,15 +184,25 @@ export const EditEventScreen = ({ route, navigation }) => {
             />
           </SectionContainer>
 
-          <TouchableOpacity
-            style={styles.EditEventScreenupdateButton}
-            onPress={handleUpdate}
-          >
-            <MaterialIcons name="check" size={24} color="white" />
-            <Text style={styles.EditEventScreenupdateButtonText}>Update Event</Text>
-          </TouchableOpacity>
+        </ScrollView>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+          <CustomButton
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Edit Event",
+                onPress: handleUpdate,
+                variant: "primary",
+              }
+            ]}
+          />
         </View>
-      </ScrollView>
+      </View>
+
     </View>
   );
 };

@@ -1,167 +1,167 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, Alert, Image } from 'react-native';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
+import { MaterialIcons } from '@expo/vector-icons';
 import { FormField } from '../Components/FormField';
-import { SectionContainer } from '../Components/SectionContainer';
-import Button from '../Components/Button';
+import { CustomButton } from '../Components/CustomButton';
 import styles from '../AdminPortal_Css';
+import { SectionContainer } from '../Components/SectionContainer';
 
 export const EditStudentBasicInfo = ({ route, navigation }) => {
-  const { studentData } = route.params;
+  // Get student data from navigation params or use empty defaults
+  const studentData = route?.params?.studentData || {};
 
-  const [formData, setFormData] = useState({
+  // Initialize state with all required student fields
+  const [basicInfo, setBasicInfo] = useState({
+    name: studentData.name || '',
     enrollmentNo: studentData.enrollmentNo || '',
     rollNo: studentData.rollNo || '',
     department: studentData.department || '',
     semester: studentData.semester?.toString() || '',
     section: studentData.section || '',
-    name: studentData.name || ''
+    profilePhoto: studentData.profilePhoto || '',
   });
 
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.enrollmentNo) newErrors.enrollmentNo = 'Enrollment No. is required';
-    if (!formData.rollNo) newErrors.rollNo = 'Roll No. is required';
-    if (!formData.name) newErrors.name = 'Name is required';
-    if (!formData.department) newErrors.department = 'Department is required';
-    if (!formData.semester) newErrors.semester = 'Semester is required';
-    if (!formData.section) newErrors.section = 'Section is required';
-
-    if (formData.semester) {
-      const semesterNum = parseInt(formData.semester);
-      if (isNaN(semesterNum) || semesterNum < 1 || semesterNum > 8) {
-        newErrors.semester = 'Semester must be between 1 and 8';
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  // Handle form field updates
+  const updateBasicInfo = (field, value) => {
+    setBasicInfo(prev => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
-  const handleSave = async () => {
-    if (validateForm()) {
-      setIsSubmitting(true);
-      try {
-        // Here you would make your API call to update the student data
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
-        navigation.goBack();
-      } catch (error) {
-        console.error('Error updating student:', error);
-      } finally {
-        setIsSubmitting(false);
-      }
+  // Handle image upload functionality
+  const handleImageUpload = () => {
+    Alert.alert('Upload Photo', 'Image upload functionality to be implemented');
+  };
+
+  // Validate and save the form data
+  const handleSave = () => {
+    // Check for required fields
+    const requiredFields = ['name', 'enrollmentNo', 'rollNo', 'department', 'semester'];
+    const missingFields = requiredFields.filter(field => !basicInfo[field]);
+
+    if (missingFields.length > 0) {
+      Alert.alert('Missing Information', 'Please fill in all required fields');
+      return;
     }
+
+    // Additional validation for semester (must be a number)
+    if (isNaN(basicInfo.semester)) {
+      Alert.alert('Invalid Input', 'Semester must be a number');
+      return;
+    }
+
+    // Handle successful save
+    Alert.alert('Success', 'Student information updated successfully');
+    navigation.goBack();
   };
 
   return (
-    <View style={styles.EditStudentBasicInfocontainer}>
+    <View style={styles.EditTeacherBasicInfocontainer}>
+      {/* Header Components */}
       <Header />
       <CustomHeader
         title="Students"
-        currentScreen="Edit Student Details"
+        currentScreen="Edit Basic Information"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
 
-      <ScrollView >
-        <Text style={styles.EditStudentBasicInfoformTitle}>Edit Student Details</Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
 
-        <View style={styles.EditStudentBasicInfolegendContainer}>
-          <View style={styles.EditStudentBasicInfolegendItem}>
-            <View style={[styles.EditStudentBasicInfolegendDot, styles.EditStudentBasicInforequiredDot]} />
-            <Text style={styles.EditStudentBasicInfolegendText}>Required*</Text>
+
+        {/* Main Form Card */}
+        <View style={styles.EditTeacherBasicInfocard}>
+
+          {/* Profile Image Section */}
+          <View style={styles.EditTeacherBasicInfoprofileImageContainer}>
+            <Image
+              source={{ uri: basicInfo.profilePhoto || 'https://placeholder.com/user' }}
+              style={styles.EditTeacherBasicInfoprofileImage}
+            />
+            <TouchableOpacity
+              style={styles.EditTeacherBasicInfoimageUploadButton}
+              onPress={handleImageUpload}
+            >
+              <MaterialIcons name="photo-camera" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
           </View>
-          <View style={styles.EditStudentBasicInfolegendItem}>
-            <View style={[styles.EditStudentBasicInfolegendDot, styles.EditStudentBasicInfooptionalDot]} />
-            <Text style={styles.EditStudentBasicInfolegendText}>Optional</Text>
-          </View>
-        </View>
-        <SectionContainer sectionNumber="1" title="Student Information">
-          <FormField
-            label="Name"
-            value={formData.name}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
-            placeholder="Enter student name"
-            error={errors.name}
-            required
-          />
 
-          <FormField
-            label="Enrollment No."
-            value={formData.enrollmentNo}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, enrollmentNo: text }))}
-            placeholder="Enter enrollment number"
-            error={errors.enrollmentNo}
-            required
-            editable={false}
-          />
+          {/* Form Fields */}
+          <SectionContainer sectionNumber="1" title="Edit Information">
 
-          <FormField
-            label="Roll No."
-            value={formData.rollNo}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, rollNo: text }))}
-            placeholder="Enter roll number"
-            error={errors.rollNo}
-            required
-            editable={false}
-          />
-        </SectionContainer>
+            <FormField
+              label="Full Name"
+              value={basicInfo.name}
+              onChangeText={(value) => updateBasicInfo('name', value)}
+              style={styles.EditTeacherBasicInfofullWidthInput}
+              required
+            />
 
-        <SectionContainer sectionNumber="2" title="Academic Details">
-          <FormField
-            label="Department"
-            value={formData.department}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, department: text }))}
-            placeholder="Enter department"
-            error={errors.department}
-            required
-          />
+            <FormField
+              label="Enrollment Number"
+              value={basicInfo.enrollmentNo}
+              onChangeText={(value) => updateBasicInfo('enrollmentNo', value)}
+              style={styles.EditTeacherBasicInfofullWidthInput}
+              required
+            />
 
-          <FormField
-            label="Semester"
-            value={formData.semester}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, semester: text }))}
-            placeholder="Enter semester (1-8)"
-            error={errors.semester}
-            required
-            keyboardType="numeric"
-          />
+            <FormField
+              label="Roll Number"
+              value={basicInfo.rollNo}
+              onChangeText={(value) => updateBasicInfo('rollNo', value)}
+              style={styles.EditTeacherBasicInfofullWidthInput}
+              required
+            />
 
-          <FormField
-            label="Section"
-            value={formData.section}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, section: text }))}
-            placeholder="Enter section"
-            error={errors.section}
-            required
-          />
-        </SectionContainer>
+            <FormField
+              label="Department"
+              value={basicInfo.department}
+              onChangeText={(value) => updateBasicInfo('department', value)}
+              style={styles.EditTeacherBasicInfofullWidthInput}
+              required
+            />
 
-        <View style={styles.EditStudentBasicInfobuttonContainer}>
-          <Button
-            title="Cancel"
-            onPress={() => navigation.goBack()}
-            variant="secondary"
-            style={styles.EditStudentBasicInfobutton}
-            disabled={isSubmitting}
-          />
-          <Button
-            title="Save Changes"
-            onPress={handleSave}
-            variant="primary"
-            style={styles.EditStudentBasicInfobutton}
-            loading={isSubmitting}
-          />
+            <FormField
+              label="Semester"
+              value={basicInfo.semester}
+              onChangeText={(value) => updateBasicInfo('semester', value)}
+              style={styles.EditTeacherBasicInfofullWidthInput}
+              required
+              keyboardType="numeric"
+            />
+
+            <FormField
+              label="Section"
+              value={basicInfo.section}
+              onChangeText={(value) => updateBasicInfo('section', value)}
+              style={styles.EditTeacherBasicInfofullWidthInput}
+            />
+          </SectionContainer>
+
         </View>
       </ScrollView>
+
+      {/* Action Buttons */}
+      <View style={styles.CreateExamSchedulebuttonContainer}>
+        <CustomButton
+          buttons={[
+            {
+              title: "Cancel",
+              onPress: () => navigation.goBack(),
+              variant: "secondary",
+            },
+            {
+              title: "Edit Info",
+              onPress: handleSave,
+              variant: "primary",
+            }
+          ]}
+        />
+      </View>
     </View>
   );
 };
-
-

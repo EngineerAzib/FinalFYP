@@ -6,6 +6,8 @@ import { Header } from '../Components/Header';
 import styles from '../AdminPortal_Css';
 import { SectionContainer } from '../Components/SectionContainer';
 import { CustomButton } from '../Components/CustomButton';
+
+
 export const EditDepartmentScreen = ({ route, navigation }) => {
   const { id } = route.params;
   const [formData, setFormData] = useState({
@@ -98,22 +100,23 @@ export const EditDepartmentScreen = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.EditDepartmentScreensafeArea}>
+
+    <View style={styles.EditDepartmentScreenmainContainer}>
       <Header />
       <CustomHeader
-        title="Department"
+        title="Departments"
         currentScreen="Edit Department"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
 
-      <ScrollView
-        style={styles.EditDepartmentScreencontainer}
-        contentContainerStyle={styles.EditDepartmentScreenscrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.EditDepartmentScreencontentContainer}>
+      <View style={styles.EditDepartmentScreencontentContainer}>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.EditDepartmentScreenscrollContent}
+        >
           <Text style={styles.EditDepartmentScreenformTitle}>Edit Department</Text>
 
           <View style={styles.EditDepartmentScreenlegendContainer}>
@@ -167,17 +170,29 @@ export const EditDepartmentScreen = ({ route, navigation }) => {
               required
             />
           </SectionContainer>
-          <View style={styles.EditDepartmentScreenbuttonContainer}>
-            <CustomButton
-              title="Update Department"
-              onPress={handleUpdate}
-              variant="primary"
-              fullWidth
-            />
-          </View>
 
+        </ScrollView>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+          <CustomButton
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Edit Dept",
+                onPress: handleUpdate,
+                variant: "primary",
+              }
+            ]}
+          />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+
+      </View>
+    </View>
+
   );
 };
+
+

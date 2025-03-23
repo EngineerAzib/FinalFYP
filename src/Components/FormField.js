@@ -4,9 +4,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Platform,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -15,7 +14,6 @@ import styles from '../AdminPortal_Css';
 
 const { width: WINDOW_WIDTH } = Dimensions.get('window');
 
-// Enhanced FormField Component
 export const FormField = ({
   label,
   placeholder,
@@ -33,36 +31,22 @@ export const FormField = ({
   const [isFocused, setIsFocused] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
 
-  // Unified input container styling
-  const renderInputContainer = (children) => (
-    <View style={[styles.FormFieldformFieldContainer, containerStyle]}>
-      {renderLabel()}
-      {renderLastValue()}
-      <View
-        style={[
-          styles.FormFieldinputWrapper,
-          isFocused && styles.FormFieldinputWrapperFocused,
-          inputStyle
-        ]}
-      >
-        {children}
-      </View>
-    </View>
-  );
-
-  // Enhanced label rendering
+  // Render label
   const renderLabel = () => (
     <View style={styles.FormFieldlabelContainer}>
-      <Text style={[
-        styles.FormFieldlabelText,
-        required ? styles.FormFieldrequiredLabel : styles.FormFieldoptionalLabel
-      ]}>
-        {label}{required ? ' *' : ' (Optional)'}
+      <Text
+        style={[
+          styles.FormFieldlabelText,
+          required ? styles.FormFieldrequiredLabel : styles.FormFieldoptionalLabel,
+        ]}
+      >
+        {label}
+        {required ? ' *' : ' (Optional)'}
       </Text>
     </View>
   );
 
-  // Last value indicator
+  // Render last value
   const renderLastValue = () => (
     lastValue && (
       <View style={styles.FormFieldlastValueContainer}>
@@ -73,11 +57,11 @@ export const FormField = ({
     )
   );
 
-  // Render different input types
-  const renderInputByType = () => {
+  // Render input based on type
+  const renderInput = () => {
     switch (type) {
       case 'date':
-        return renderInputContainer(
+        return (
           <TouchableOpacity
             style={styles.FormFielddateInputContent}
             onPress={() => setShowPicker(true)}
@@ -85,11 +69,7 @@ export const FormField = ({
             <Text style={value ? styles.FormFieldinputText : styles.FormFieldplaceholderText}>
               {value || placeholder}
             </Text>
-            <Ionicons
-              name="calendar-outline"
-              size={24}
-              color="#6C63FF"
-            />
+            <Ionicons name="calendar-outline" size={24} color="#6C63FF" />
             {Platform.OS === 'android' && showPicker && (
               <DateTimePicker
                 value={value ? new Date(value) : new Date()}
@@ -106,7 +86,7 @@ export const FormField = ({
         );
 
       case 'file':
-        return renderInputContainer(
+        return (
           <View style={styles.FormFieldfileInputContent}>
             <TouchableOpacity
               style={styles.FormFieldfileChooseButton}
@@ -132,9 +112,9 @@ export const FormField = ({
         );
 
       default:
-        return renderInputContainer(
+        return (
           <TextInput
-            style={styles.FormFieldtextInput}
+            style={[styles.FormFieldtextInput, inputStyle]}
             placeholder={placeholder}
             value={value}
             onChangeText={onChangeText}
@@ -147,8 +127,18 @@ export const FormField = ({
     }
   };
 
-  return renderInputByType();
+  return (
+    <View style={[styles.FormFieldformFieldContainer, containerStyle]}>
+      {renderLabel()}
+      {renderLastValue()}
+      <View
+        style={[
+          styles.FormFieldinputWrapper,
+          isFocused && styles.FormFieldinputWrapperFocused,
+        ]}
+      >
+        {renderInput()}
+      </View>
+    </View>
+  );
 };
-
-
-

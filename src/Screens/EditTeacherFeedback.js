@@ -5,6 +5,8 @@ import { CustomHeader } from '../Components/CustomHeader';
 import { MaterialIcons } from '@expo/vector-icons';
 import { FormField } from '../Components/FormField';
 import styles from '../AdminPortal_Css';
+import { CustomButton } from '../Components/CustomButton';
+import { SectionContainer } from '../Components/SectionContainer';
 
 
 export const EditTeacherFeedback = ({ route, navigation }) => {
@@ -58,8 +60,8 @@ export const EditTeacherFeedback = ({ route, navigation }) => {
         navigation={navigation}
       />
 
-      <ScrollView >
-        <Text style={styles.EditTeacherFeedbackformTitle}>Edit Feedback</Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        <Text style={styles.EditTeacherFeedbackformTitle}>Edit Teacher's Feedback</Text>
 
         <View style={styles.EditTeacherFeedbacklegendContainer}>
           <View style={styles.EditTeacherFeedbacklegendItem}>
@@ -73,9 +75,11 @@ export const EditTeacherFeedback = ({ route, navigation }) => {
         </View>
         {feedback.map((item, index) => (
           <View key={index} style={styles.EditTeacherFeedbackcard}>
-            <Text style={styles.EditTeacherFeedbackcardTitle}>Course Feedback</Text>
 
-            <View style={styles.EditTeacherFeedbackformContainer}>
+            <SectionContainer
+              sectionNumber={index + 1}
+              title={`Course Feedback (${item.course.code})`}
+            >
               <FormField
                 label="Course Code"
                 value={item.course.code}
@@ -135,15 +139,26 @@ export const EditTeacherFeedback = ({ route, navigation }) => {
                 keyboardType="numeric"
                 style={styles.EditTeacherFeedbackfullWidthInput}
               />
-            </View>
+            </SectionContainer>
           </View>
         ))}
       </ScrollView>
 
-      <View style={styles.EditTeacherFeedbackfooter}>
-        <TouchableOpacity style={styles.EditTeacherFeedbacksaveButton} onPress={handleSave}>
-          <Text style={styles.EditTeacherFeedbacksaveButtonText}>Save Changes</Text>
-        </TouchableOpacity>
+      <View style={styles.CreateExamSchedulebuttonContainer}>
+        <CustomButton
+          buttons={[
+            {
+              title: "Cancel",
+              onPress: () => navigation.goBack(),
+              variant: "secondary",
+            },
+            {
+              title: "Edit feedback",
+              onPress: handleSave,
+              variant: "primary",
+            }
+          ]}
+        />
       </View>
     </View>
   );

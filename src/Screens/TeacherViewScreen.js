@@ -115,7 +115,7 @@ console.log(teacherData,"Tec")
               name="edit"
               size={24}
               color="#6C63FF"
-              onPress={() => navigation.navigate('EditTeacherBasicInfo', {})}
+              onPress={() => navigation.navigate('EditTeacherBasicInfo', { teacherData })}
             />
           </View>
 

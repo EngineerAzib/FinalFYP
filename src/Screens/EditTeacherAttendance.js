@@ -3,8 +3,12 @@ import { View, ScrollView, StyleSheet, Text, TouchableOpacity, Alert } from 'rea
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import { MaterialIcons } from '@expo/vector-icons';
-import { FormField } from '../Components/FormField'; // Assuming this is your existing component
+import { FormField } from '../Components/FormField';
 import styles from '../AdminPortal_Css';
+import { CustomButton } from '../Components/CustomButton';
+import { SectionContainer } from '../Components/SectionContainer';
+
+
 
 // Edit Teacher Attendance Screen
 export const EditTeacherAttendance = ({ route, navigation }) => {
@@ -54,8 +58,8 @@ export const EditTeacherAttendance = ({ route, navigation }) => {
       />
 
 
-      <ScrollView >
-        <Text style={styles.EditTeacherAttendanceformTitle}>Edit Attendance</Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        <Text style={styles.EditTeacherAttendanceformTitle}>Edit Teacher's Attendance</Text>
 
         <View style={styles.EditTeacherAttendancelegendContainer}>
           <View style={styles.EditTeacherAttendancelegendItem}>
@@ -69,10 +73,11 @@ export const EditTeacherAttendance = ({ route, navigation }) => {
         </View>
         {coursesAttendance.map((course, index) => (
           <View key={index} style={styles.EditTeacherAttendancecard}>
-            <Text style={styles.EditTeacherAttendancecardTitle}>{course.code}: {course.name}</Text>
 
-            <View style={styles.EditTeacherAttendanceformContainer}>
-              <FormField
+            <SectionContainer
+              sectionNumber={index + 1} // Use index + 1 as the section number
+              title={`Teacher's Attendance (${course.code})`} // Append course code to the title
+            >              <FormField
                 label="Course Code"
                 value={course.code}
                 onChangeText={(value) => updateCourseAttendance(index, 'code', value)}
@@ -115,16 +120,28 @@ export const EditTeacherAttendance = ({ route, navigation }) => {
                 keyboardType="numeric"
                 style={styles.EditTeacherAttendancefullWidthInput}
               />
-            </View>
+            </SectionContainer>
           </View>
         ))}
       </ScrollView>
 
-      <View style={styles.EditTeacherAttendancefooter}>
-        <TouchableOpacity style={styles.EditTeacherAttendancesaveButton} onPress={handleSave}>
-          <Text style={styles.EditTeacherAttendancesaveButtonText}>Save Changes</Text>
-        </TouchableOpacity>
+      <View style={styles.CreateExamSchedulebuttonContainer}>
+        <CustomButton
+          buttons={[
+            {
+              title: "Cancel",
+              onPress: () => navigation.goBack(),
+              variant: "secondary",
+            },
+            {
+              title: "Edit Attendance",
+              onPress: handleSave,
+              variant: "primary",
+            }
+          ]}
+        />
       </View>
     </View>
   );
 };
+

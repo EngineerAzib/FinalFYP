@@ -5,7 +5,8 @@ import { CustomHeader } from '../Components/CustomHeader';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { FormField } from '../Components/FormField';
 import styles from '../AdminPortal_Css';
-
+import { CustomButton } from '../Components/CustomButton';
+import { SectionContainer } from '../Components/SectionContainer';
 
 
 export const EditTeacherSchedule = ({ route, navigation }) => {
@@ -72,7 +73,7 @@ export const EditTeacherSchedule = ({ route, navigation }) => {
         navigation={navigation}
       />
 
-      <ScrollView >
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         <Text style={styles.EditTeacherScheduleformTitle}>Edit Teacher's Schedule</Text>
 
         <View style={styles.EditTeacherSchedulelegendContainer}>
@@ -88,9 +89,9 @@ export const EditTeacherSchedule = ({ route, navigation }) => {
         {days.map((day) => (
           <View key={day} style={styles.EditTeacherSchedulecard}>
             <View style={styles.EditTeacherScheduledayHeader}>
-              <Text style={styles.EditTeacherSchedulecardTitle}>
+              {/* <Text style={styles.EditTeacherSchedulecardTitle}>
                 {day.charAt(0).toUpperCase() + day.slice(1)}
-              </Text>
+              </Text> */}
               <TouchableOpacity
                 style={styles.EditTeacherScheduleaddButton}
                 onPress={() => addSlot(day)}
@@ -101,7 +102,12 @@ export const EditTeacherSchedule = ({ route, navigation }) => {
 
             {schedule[day].map((slot, index) => (
               <View key={index} style={styles.EditTeacherScheduleslotContainer}>
-                <View style={styles.EditTeacherScheduleformContainer}>
+                {/* <View style={styles.EditTeacherScheduleformContainer}> */}
+                <SectionContainer
+                  sectionNumber={index + 1}
+                  title={`Teacher's Schedule (${day.charAt(0).toUpperCase() + day.slice(1)})`}
+                >
+
                   <FormField
                     label="Time"
                     value={slot.time}
@@ -123,7 +129,9 @@ export const EditTeacherSchedule = ({ route, navigation }) => {
                     onChangeText={(value) => updateSlot(day, index, 'section', value)}
                     style={styles.EditTeacherSchedulefullWidthInput}
                   />
-                </View>
+                </SectionContainer>
+
+                {/* </View> */}
 
                 <TouchableOpacity
                   style={styles.EditTeacherScheduleremoveButton}
@@ -137,10 +145,21 @@ export const EditTeacherSchedule = ({ route, navigation }) => {
         ))}
       </ScrollView>
 
-      <View style={styles.EditTeacherSchedulefooter}>
-        <TouchableOpacity style={styles.EditTeacherSchedulesaveButton} onPress={handleSave}>
-          <Text style={styles.EditTeacherSchedulesaveButtonText}>Save Changes</Text>
-        </TouchableOpacity>
+      <View style={styles.CreateExamSchedulebuttonContainer}>
+        <CustomButton
+          buttons={[
+            {
+              title: "Cancel",
+              onPress: () => navigation.goBack(),
+              variant: "secondary",
+            },
+            {
+              title: "Edit Schedule",
+              onPress: handleSave,
+              variant: "primary",
+            }
+          ]}
+        />
       </View>
     </View>
   );

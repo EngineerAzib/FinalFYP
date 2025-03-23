@@ -96,8 +96,7 @@ export const CreateExamSchedule = ({ navigation }) => {
   };
 
   return (
-    // IMPORTANT: The root View must have flex: 1 to fill the screen
-    // This allows us to properly position the footer at the bottom
+
     <View style={styles.CreateExamSchedulemainContainer}>
       <Header />
       <CustomHeader
@@ -108,15 +107,13 @@ export const CreateExamSchedule = ({ navigation }) => {
         navigation={navigation}
       />
 
-      {/* Content container needs flex: 1 to properly fill available space */}
       <View style={styles.CreateExamSchedulecontentContainer}>
-        {/* ScrollView should not have flex: 1 in its style prop */}
-        {/* Instead, it should naturally fill the space between header and footer */}
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.CreateExamSchedulescrollContent}
         >
-          <Text style={styles.CreateExamScheduleformTitle}>Create Schedule</Text>
+          <Text style={styles.CreateExamScheduleformTitle}>Create Exam Schedule</Text>
 
           <View style={styles.CreateExamSchedulelegendContainer}>
             <View style={styles.CreateExamSchedulelegendItem}>

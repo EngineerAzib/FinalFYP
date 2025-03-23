@@ -4,59 +4,34 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Text,
-  Platform
+  Text
 } from 'react-native';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import { SectionContainer } from '../Components/SectionContainer';
 import styles from '../AdminPortal_Css';
+import { CustomButton } from '../Components/CustomButton';
 
-const EnhancedCustomHeader = ({ navigation }) => (
-  <View style={styles.CreateSubjectsScreenenhancedHeader}>
-    <CustomHeader
-      title="Course"
-      currentScreen="Create Course"
-      showSearch={false}
-      showRefresh={false}
-      navigation={navigation}
-    />
-  </View>);
 const CreateSubjectsScreen = ({ navigation }) => {
-  const [subjects, setSubjects] = useState([{
-    departmentId: '',
-    year: '',
-    semester: '',
-    subjectName: '',
-    theoryMarks: '',
-    practicalMarks: '',
-  }]);
+  const [subjects, setSubjects] = useState([
+    {
+      departmentId: '',
+      year: '',
+      semester: '',
+      subjectName: '',
+      theoryMarks: '',
+      practicalMarks: '',
+    }
+  ]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch departments from API
-    /* Example API call:
-    const fetchDepartments = async () => {
-      try {
-        const response = await fetch('your-api-endpoint/departments');
-        const data = await response.json();
-        setDepartments(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching departments:', error);
-        setLoading(false);
-      }
-    };
-    fetchDepartments();
-    */
-
-    // Mock departments for demonstration
+    // Simulating fetching departments (Replace with API call)
     setDepartments([
       { id: 1, name: 'Computer Science' },
       { id: 2, name: 'Electrical Engineering' },
-      // Add more departments as needed
     ]);
     setLoading(false);
   }, []);
@@ -77,7 +52,7 @@ const CreateSubjectsScreen = ({ navigation }) => {
         subjectName: '',
         theoryMarks: '',
         practicalMarks: '',
-      },
+      }
     ]);
   };
 
@@ -88,32 +63,26 @@ const CreateSubjectsScreen = ({ navigation }) => {
 
   const handleSubmit = async () => {
     // TODO: Implement API call to save subjects
-    /* Example implementation:
-    try {
-      const response = await fetch('your-api-endpoint/subjects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(subjects),
-      });
-      if (response.ok) {
-        navigation.goBack();
-      }
-    } catch (error) {
-      console.error('Error creating subjects:', error);
-    }
-    */
+    console.log('Subjects:', subjects);
   };
 
   return (
-    <View style={styles.CreateSubjectsScreencontainer}>
+    <View style={styles.CreateSubjectsScreenmainContainer}>
       <Header />
-      <EnhancedCustomHeader />
-      <ScrollView style={styles.CreateSubjectsScreencontainer}>
-        <View style={styles.CreateSubjectsScreencontentContainer}>
+      <CustomHeader
+        title="Courses"
+        currentScreen="Create Course"
+        showSearch={false}
+        showRefresh={false}
+        navigation={navigation}
+      />
 
-          <Text style={styles.CreateSubjectsScreenformTitle}>Create Courses</Text>
+      <View style={styles.CreateSubjectsScreencontentContainer}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.CreateSubjectsScreenscrollContent}
+        >
+          <Text style={styles.CreateSubjectsScreenformTitle}>Add New Courses</Text>
 
           <View style={styles.CreateSubjectsScreenlegendContainer}>
             <View style={styles.CreateSubjectsScreenlegendItem}>
@@ -125,23 +94,24 @@ const CreateSubjectsScreen = ({ navigation }) => {
               <Text style={styles.CreateSubjectsScreenlegendText}>Optional</Text>
             </View>
           </View>
+
           <SectionContainer sectionNumber="1" title="Course Information">
             {subjects.map((subject, index) => (
-              <View key={index} >
+              <View key={index}>
                 <FormField
                   label="Department"
                   placeholder="Select Department"
                   type="select"
                   required
-                  value={subject.department}
-                  onChangeText={(text) => setFormData({ ...formData, department: text })}
+                  value={subject.departmentId}  // ✅ Fixed value
+                  onChangeText={(value) => handleInputChange(index, 'departmentId', value)} // ✅ Fixed handler
                 />
                 <FormField
                   required
                   label="Year"
                   dropdown
                   value={subject.year}
-                  onChangeText={(value) => handleInputChange(index, 'year', value)}
+                  onValueChange={(value) => handleInputChange(index, 'year', value)} // ✅ Fixed handler
                   items={[
                     { label: '1st Year', value: '1' },
                     { label: '2nd Year', value: '2' },
@@ -149,7 +119,6 @@ const CreateSubjectsScreen = ({ navigation }) => {
                     { label: '4th Year', value: '4' },
                   ]}
                   placeholder="Select Year"
-
                 />
 
                 <FormField
@@ -157,13 +126,12 @@ const CreateSubjectsScreen = ({ navigation }) => {
                   required
                   dropdown
                   value={subject.semester}
-                  onChangeText={(value) => handleInputChange(index, 'semester', value)}
+                  onValueChange={(value) => handleInputChange(index, 'semester', value)} // ✅ Fixed handler
                   items={[
                     { label: '1st Semester', value: '1' },
                     { label: '2nd Semester', value: '2' },
                   ]}
                   placeholder="Select Semester"
-
                 />
 
                 <FormField
@@ -190,11 +158,9 @@ const CreateSubjectsScreen = ({ navigation }) => {
                   placeholder="Total Practical Marks (if any)"
                   keyboardType="numeric"
                 />
-
               </View>
-
-            ))}</SectionContainer>
-
+            ))}
+          </SectionContainer>
 
           <View style={styles.CreateSubjectsScreenbuttonContainer}>
             <TouchableOpacity
@@ -214,18 +180,26 @@ const CreateSubjectsScreen = ({ navigation }) => {
             )}
           </View>
 
-          <TouchableOpacity
-            style={styles.CreateSubjectsScreensubmitButton}
-            onPress={handleSubmit}
-          >
-            <Text style={styles.CreateSubjectsScreensubmitButtonText}>+ Assign Subjects</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        </ScrollView>  
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+            <CustomButton
+              buttons={[
+                {
+                  title: "Cancel",
+                  onPress: () => navigation.goBack(),
+                  variant: "secondary",
+                },
+                {
+                  title: "Create Course",
+                  onPress: handleSubmit,
+                  variant: "primary",
+                }
+              ]}
+            />
+          </View>
+      </View>
     </View>
   );
 };
-
-
 
 export default CreateSubjectsScreen;

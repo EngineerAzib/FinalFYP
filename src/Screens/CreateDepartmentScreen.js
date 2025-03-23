@@ -87,27 +87,24 @@ export const CreateDepartmentScreen = ({ navigation }) => {
   };
 
   return (
-    // IMPORTANT: The root View must have flex: 1 to fill the screen
-    // This allows us to properly position the footer at the bottom
+
     <View style={styles.CreateDepartmentScreenmainContainer}>
       <Header />
       <CustomHeader
-        title="Department"
+        title="Departments"
         currentScreen="Create Department"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
 
-      {/* Content container needs flex: 1 to properly fill available space */}
       <View style={styles.CreateDepartmentScreencontentContainer}>
-        {/* ScrollView should not have flex: 1 in its style prop */}
-        {/* Instead, it should naturally fill the space between header and footer */}
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.CreateDepartmentScreenscrollContent}
         >
-          <Text style={styles.CreateDepartmentScreenformTitle}>Create Department</Text>
+          <Text style={styles.CreateDepartmentScreenformTitle}>Add Department</Text>
 
           <View style={styles.CreateDepartmentScreenlegendContainer}>
             <View style={styles.CreateDepartmentScreenlegendItem}>
@@ -170,13 +167,21 @@ export const CreateDepartmentScreen = ({ navigation }) => {
           </SectionContainer>
 
         </ScrollView>
-        <View style={styles.EditDepartmentScreenbuttonContainer}>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
-            title="Create Department"
-            onPress={handleSubmit}
-            disabled={false}
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Create Department",
+                onPress: handleSubmit,
+                variant: "primary",
+              }
+            ]}
           />
-
         </View>
       </View>
 

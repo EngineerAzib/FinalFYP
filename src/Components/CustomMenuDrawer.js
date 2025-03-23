@@ -10,17 +10,25 @@ import {
   Image,
   TouchableWithoutFeedback,
   Modal,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import styles from '../AdminPortal_Css';
 
+// Enable LayoutAnimation for Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 const { width, height } = Dimensions.get('window');
 
 const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
-  // Animation values
   const [slideAnim] = useState(new Animated.Value(-width));
   const [fadeAnim] = useState(new Animated.Value(0));
   const [expandedItems, setExpandedItems] = useState({});
+  const [menuItemLayouts, setMenuItemLayouts] = useState({});
   const scrollViewRef = useRef(null);
   // Menu items data structure
   const menuItems = [
@@ -57,7 +65,7 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
       icon: 'groups',
       subItems: [
         { id: 'all-teachers', title: 'All Teachers', screen: 'AllTeachersScreen', icon: 'people' },
-        { id: 'create-teachers', title: 'Create Teachers', screen: 'CreateTeacherScreen', icon: 'add' },
+        { id: 'create-teachers', title: 'Create Teachers', screen: 'CreateTeacherForm', icon: 'add' },
 
       ],
     },
@@ -106,7 +114,7 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
       title: 'Exam Schedule',
       icon: 'date-range',
       subItems: [
-        { id: 'exam-schedule', title: 'Department->Year->Exam Schedules', screen: 'ExamScheduleView', icon: 'list' },
+        { id: 'exam-schedule', title: 'Department->Year->Exam Schedules', screen: 'ExamScheduleDepartmentScreen', icon: 'list' },
         { id: 'create-exam-schedule', title: 'Create Exam Schedule', screen: 'CreateExamSchedule', icon: 'add' },
       ],
     },
@@ -115,7 +123,7 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
       title: 'Semester Registeration',
       icon: 'domain',
       subItems: [
-        { id: 'semester-registeration', title: 'Semester Registerations', screen: 'SemesterRegistrationView', icon: 'assignment' },
+        { id: 'semester-registeration', title: 'Semester Registerations', screen: 'SemesterReg_DepartmentListScreen', icon: 'assignment' },
         { id: 'create-semester-registeration', title: 'Create Semester Registeration ', screen: 'CreateSemesterRegistration', icon: 'add' },
       ],
     },
@@ -151,18 +159,27 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
     }
   }, [isVisible]);
 
+  // Enhanced toggle expand function with smooth scrolling
   const toggleExpand = (itemId, index) => {
-    setExpandedItems((prev) => {
-      const newState = {
-        ...prev,
-        [itemId]: !prev[itemId],
-      };
+    // Configure animation
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
-      // If this is the last item and we're expanding it, scroll to the bottom
-      if (index === menuItems.length - 1 && !prev[itemId]) {
-        // Use setTimeout to ensure the expansion happens before scrolling
+    setExpandedItems((prev) => {
+      const newState = { ...prev, [itemId]: !prev[itemId] };
+
+      // If we're expanding the item
+      if (!prev[itemId]) {
+        // Wait for layout to update before scrolling
         setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({ animated: true });
+          const itemLayout = menuItemLayouts[itemId];
+          if (itemLayout && scrollViewRef.current) {
+            // Calculate scroll position based on item position
+            const scrollPosition = Math.max(0, itemLayout.y - 100); // 100px padding from top
+            scrollViewRef.current.scrollTo({
+              y: scrollPosition,
+              animated: true,
+            });
+          }
         }, 100);
       }
 
@@ -181,12 +198,21 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
     });
   };
 
-  // Modified renderMenuItem function to include separator for Dashboard
+  // Enhanced renderMenuItem with layout measurement
   const renderMenuItem = (item, index) => {
     const isLastItem = index === menuItems.length - 1;
 
     return (
-      <React.Fragment key={item.id}>
+      <View
+        key={item.id}
+        onLayout={(event) => {
+          const layout = event.nativeEvent.layout;
+          setMenuItemLayouts(prev => ({
+            ...prev,
+            [item.id]: layout
+          }));
+        }}
+      >
         {item.isDashboard ? (
           <>
             <TouchableOpacity
@@ -208,7 +234,7 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
             <TouchableOpacity
               style={[
                 styles.CustomMenuDrawermenuItem,
-                isLastItem && expandedItems[item.id] && { marginBottom: 8 }
+                expandedItems[item.id] && styles.CustomMenuDrawermenuItemExpanded
               ]}
               onPress={() => toggleExpand(item.id, index)}
               activeOpacity={0.7}
@@ -221,11 +247,9 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
               </View>
               <Animated.View
                 style={{
-                  transform: [
-                    {
-                      rotate: expandedItems[item.id] ? '90deg' : '0deg',
-                    },
-                  ],
+                  transform: [{
+                    rotate: expandedItems[item.id] ? '90deg' : '0deg'
+                  }]
                 }}
               >
                 <MaterialIcons name="chevron-right" size={20} color="#4B5563" />
@@ -233,10 +257,12 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
             </TouchableOpacity>
 
             {expandedItems[item.id] && (
-              <Animated.View style={[
-                styles.CustomMenuDrawersubMenuContainer,
-                isLastItem && { marginBottom: 100 } // Add extra margin for last item's submenu
-              ]}>
+              <Animated.View
+                style={[
+                  styles.CustomMenuDrawersubMenuContainer,
+                  isLastItem && { marginBottom: 16 }
+                ]}
+              >
                 {item.subItems?.map((subItem) => (
                   <TouchableOpacity
                     key={subItem.id}
@@ -247,7 +273,9 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
                     <View style={styles.CustomMenuDrawersubMenuIconContainer}>
                       <MaterialIcons name={subItem.icon} size={16} color="#6B7280" />
                     </View>
-                    <Text style={styles.CustomMenuDrawersubMenuTitle}>{subItem.title}</Text>
+                    <Text style={styles.CustomMenuDrawersubMenuTitle}>
+                      {subItem.title}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </Animated.View>
@@ -256,7 +284,7 @@ const CustomMenuDrawer = ({ isVisible, onClose, navigation }) => {
             {!isLastItem && <View style={styles.CustomMenuDrawerseparator} />}
           </>
         )}
-      </React.Fragment>
+      </View>
     );
   };
   return (

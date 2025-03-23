@@ -7,6 +7,7 @@ import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import styles from '../AdminPortal_Css';
 import { SectionContainer } from '../Components/SectionContainer';
+import { CustomButton } from '../Components/CustomButton';
 
 
 export const EditNewsScreen = ({ route, navigation }) => {
@@ -42,7 +43,7 @@ export const EditNewsScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.EditNewsScreencontainer}>
+    <View style={styles.EditNewsScreenmainContainer}>
       <Header />
       <CustomHeader
         title="News"
@@ -51,9 +52,13 @@ export const EditNewsScreen = ({ route, navigation }) => {
         showRefresh={false}
         navigation={navigation}
       />
-      <ScrollView style={styles.EditNewsScreenscrollView}>
-        <View style={styles.EditNewsScreencontentContainer}>
-          <Text style={styles.EditNewsScreenformTitle}>Edit News</Text>
+
+      <View style={styles.EditNewsScreencontentContainer}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.EditNewsScreenscrollContent}
+        >
+          <Text style={styles.EditNewsScreenformTitle}>Revise News</Text>
 
           <View style={styles.EditNewsScreenlegendContainer}>
             <View style={styles.EditNewsScreenlegendItem}>
@@ -134,18 +139,27 @@ export const EditNewsScreen = ({ route, navigation }) => {
             />
           </SectionContainer>
 
-          <TouchableOpacity
-            style={styles.EditNewsScreenupdateButton}
-            onPress={handleUpdate}
-          >
-            <View style={styles.EditNewsScreenbuttonContent}>
-              <MaterialIcons name="check" size={24} color="white" />
-              <Text style={styles.EditNewsScreenupdateButtonText}>Update News</Text>
-            </View>
-          </TouchableOpacity>
+ 
+        </ScrollView>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+          <CustomButton
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Edit News",
+                onPress: handleUpdate,
+                variant: "primary",
+              }
+            ]}
+          />
         </View>
-      </ScrollView>
+      </View>
     </View>
+
   );
 };
 

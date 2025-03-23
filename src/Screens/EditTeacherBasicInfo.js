@@ -1,34 +1,40 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Text, TouchableOpacity, Alert, Image } from 'react-native';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
-import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { FormField } from '../Components/FormField';
 import styles from '../AdminPortal_Css';
+import { CustomButton } from '../Components/CustomButton';
+import { SectionContainer } from '../Components/SectionContainer';
 
-// Edit Teacher Basic Info Screen
 export const EditTeacherBasicInfo = ({ route, navigation }) => {
+  // Get teacher data from navigation params or use dummy data
   const teacherData = route?.params?.teacherData || {};
+
+  // Initialize state with current teacher data
   const [basicInfo, setBasicInfo] = useState({
-    name: teacherData.name || '',
-    registrationNo: teacherData.registrationNo || '',
-    designation: teacherData.designation || '',
-    status: teacherData.status || '',
-    gender: teacherData.gender || '',
-    profilePhoto: teacherData.profilePhoto || '',
+    name: '',
+    registrationNo: '',
+    designation: '',
+    status: '',
+    gender: '',
+    profilePhoto: '',
   });
 
-  const handleSave = () => {
-    // Validate required fields
-    if (!basicInfo.name || !basicInfo.registrationNo || !basicInfo.designation) {
-      Alert.alert('Missing Information', 'Please fill in all required fields');
-      return;
+  // Use useEffect to properly set initial data when the component mounts
+  useEffect(() => {
+    if (teacherData) {
+      setBasicInfo({
+        name: teacherData.name || '',
+        registrationNo: teacherData.registrationNo || '',
+        designation: teacherData.designation || '',
+        status: teacherData.status || '',
+        gender: teacherData.gender || '',
+        profilePhoto: teacherData.profilePhoto || 'https://placeholder.com/user',
+      });
     }
-
-    // Handle save logic here
-    Alert.alert('Success', 'Basic information updated successfully');
-    navigation.goBack();
-  };
+  }, [teacherData]);
 
   const updateBasicInfo = (field, value) => {
     setBasicInfo(prev => ({
@@ -38,8 +44,37 @@ export const EditTeacherBasicInfo = ({ route, navigation }) => {
   };
 
   const handleImageUpload = () => {
-    // Image upload logic would go here
     Alert.alert('Upload Photo', 'Image upload functionality to be implemented');
+  };
+
+  const handleSave = () => {
+    // Validate required fields
+    const requiredFields = ['name', 'registrationNo', 'designation'];
+    const missingFields = requiredFields.filter(field => !basicInfo[field]);
+
+    if (missingFields.length > 0) {
+      Alert.alert('Missing Information', 'Please fill in all required fields');
+      return;
+    }
+
+    // Here you would typically update the teacher data in your backend
+    // For now, we'll just show a success message and go back
+    Alert.alert(
+      'Success',
+      'Teacher information updated successfully',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            // Pass the updated data back to the previous screen
+            navigation.navigate('TeacherViewScreen', {
+              teacherData: basicInfo,
+              refresh: true,
+            });
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -53,25 +88,14 @@ export const EditTeacherBasicInfo = ({ route, navigation }) => {
         navigation={navigation}
       />
 
-      <ScrollView >
-        <Text style={styles.EditTeacherBasicInfoformTitle}>Edit Information</Text>
-
-        <View style={styles.EditTeacherBasicInfolegendContainer}>
-          <View style={styles.EditTeacherBasicInfolegendItem}>
-            <View style={[styles.EditTeacherBasicInfolegendDot, styles.EditTeacherBasicInforequiredDot]} />
-            <Text style={styles.EditTeacherBasicInfolegendText}>Required*</Text>
-          </View>
-          <View style={styles.EditTeacherBasicInfolegendItem}>
-            <View style={[styles.EditTeacherBasicInfolegendDot, styles.EditTeacherBasicInfooptionalDot]} />
-            <Text style={styles.EditTeacherBasicInfolegendText}>Optional</Text>
-          </View>
-        </View>
+      <ScrollView>
+        {/* Main form card */}
         <View style={styles.EditTeacherBasicInfocard}>
-          <Text style={styles.EditTeacherBasicInfocardTitle}>Basic Information</Text>
 
+          {/* Profile Image Section */}
           <View style={styles.EditTeacherBasicInfoprofileImageContainer}>
             <Image
-              source={{ uri: basicInfo.profilePhoto || 'https://placeholder.com/user' }}
+              source={{ uri: basicInfo.profilePhoto }}
               style={styles.EditTeacherBasicInfoprofileImage}
             />
             <TouchableOpacity
@@ -82,13 +106,15 @@ export const EditTeacherBasicInfo = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.EditTeacherBasicInfoformContainer}>
+          {/* Form Fields */}
+          <SectionContainer sectionNumber="1" title="Teachers Information">
             <FormField
               label="Full Name"
               value={basicInfo.name}
               onChangeText={(value) => updateBasicInfo('name', value)}
               style={styles.EditTeacherBasicInfofullWidthInput}
               required
+              placeholder="Enter full name"
             />
 
             <FormField
@@ -97,6 +123,7 @@ export const EditTeacherBasicInfo = ({ route, navigation }) => {
               onChangeText={(value) => updateBasicInfo('registrationNo', value)}
               style={styles.EditTeacherBasicInfofullWidthInput}
               required
+              placeholder="Enter registration number"
             />
 
             <FormField
@@ -105,6 +132,7 @@ export const EditTeacherBasicInfo = ({ route, navigation }) => {
               onChangeText={(value) => updateBasicInfo('designation', value)}
               style={styles.EditTeacherBasicInfofullWidthInput}
               required
+              placeholder="Enter designation"
             />
 
             <FormField
@@ -112,6 +140,7 @@ export const EditTeacherBasicInfo = ({ route, navigation }) => {
               value={basicInfo.status}
               onChangeText={(value) => updateBasicInfo('status', value)}
               style={styles.EditTeacherBasicInfofullWidthInput}
+              placeholder="Enter status"
             />
 
             <FormField
@@ -119,15 +148,28 @@ export const EditTeacherBasicInfo = ({ route, navigation }) => {
               value={basicInfo.gender}
               onChangeText={(value) => updateBasicInfo('gender', value)}
               style={styles.EditTeacherBasicInfofullWidthInput}
+              placeholder="Enter gender"
             />
-          </View>
+          </SectionContainer>
         </View>
       </ScrollView>
 
-      <View style={styles.EditTeacherBasicInfofooter}>
-        <TouchableOpacity style={styles.EditTeacherBasicInfosaveButton} onPress={handleSave}>
-          <Text style={styles.EditTeacherBasicInfosaveButtonText}>Save Changes</Text>
-        </TouchableOpacity>
+      {/* Action Buttons */}
+      <View style={styles.CreateExamSchedulebuttonContainer}>
+        <CustomButton
+          buttons={[
+            {
+              title: "Cancel",
+              onPress: () => navigation.goBack(),
+              variant: "secondary",
+            },
+            {
+              title: "Save Changes",
+              onPress: handleSave,
+              variant: "primary",
+            }
+          ]}
+        />
       </View>
     </View>
   );

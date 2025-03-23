@@ -1,4 +1,3 @@
-// src/screens/CreateNewsScreen.js
 import React, { useState } from 'react';
 import { View, TouchableOpacity, StyleSheet, ScrollView, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -7,6 +6,7 @@ import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import styles from '../AdminPortal_Css';
 import { SectionContainer } from '../Components/SectionContainer';
+import { CustomButton } from '../Components/CustomButton';
 
 export const CreateNewsScreen = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -26,11 +26,19 @@ export const CreateNewsScreen = ({ navigation }) => {
     'News',
     'Other'
   ];
+  const handleUpdate = async () => {
+    try {
+
+
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error updating news:', error);
+    }
+  };
 
   const handleCreate = async () => {
     try {
-      // Here you would make your API call to create a new news item
-      // await createNews(formData);
+
 
       navigation.goBack();
     } catch (error) {
@@ -39,7 +47,7 @@ export const CreateNewsScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.CreateNewsScreencontainer}>
+    <View style={styles.CreateNewsScreenmainContainer}>
       <Header />
       <CustomHeader
         title="News"
@@ -48,9 +56,13 @@ export const CreateNewsScreen = ({ navigation }) => {
         showRefresh={false}
         navigation={navigation}
       />
-      <ScrollView style={styles.CreateNewsScreenscrollView}>
-        <View style={styles.CreateNewsScreencontentContainer}>
-          <Text style={styles.CreateNewsScreenformTitle}>Create News</Text>
+
+      <View style={styles.CreateNewsScreencontentContainer}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.CreateNewsScreenscrollContent}
+        >
+          <Text style={styles.CreateNewsScreenformTitle}>Add News</Text>
 
           <View style={styles.CreateNewsScreenlegendContainer}>
             <View style={styles.CreateNewsScreenlegendItem}>
@@ -62,7 +74,7 @@ export const CreateNewsScreen = ({ navigation }) => {
               <Text style={styles.CreateNewsScreenlegendText}>Optional</Text>
             </View>
           </View>
-          <SectionContainer sectionNumber="1" title="Student Information">
+          <SectionContainer sectionNumber="1" title="Publish News">
 
             <FormField
               label="Title"
@@ -132,8 +144,10 @@ export const CreateNewsScreen = ({ navigation }) => {
               maxSize="5MB"
               helperText="Recommended size: 1200x630px"
             />
+          </SectionContainer>
+          <SectionContainer sectionNumber="1" title="News Preview">
+
             <View style={styles.CreateNewsScreenpreviewContainer}>
-              <Text style={styles.CreateNewsScreenpreviewLabel}>Preview</Text>
               <View style={styles.CreateNewsScreenpreviewCard}>
                 {formData.image ? (
                   <Image
@@ -159,16 +173,27 @@ export const CreateNewsScreen = ({ navigation }) => {
             </View>
           </SectionContainer>
 
-          <TouchableOpacity
-            style={styles.CreateNewsScreencreateButton}
-            onPress={handleCreate}
-          >
-            <MaterialIcons name="add" size={24} color="white" />
-            <Text style={styles.CreateNewsScreencreateButtonText}>Publish News</Text>
-          </TouchableOpacity>
+
+        </ScrollView>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+          <CustomButton
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Create News",
+                onPress: handleUpdate,
+                variant: "primary",
+              }
+            ]}
+          />
         </View>
-      </ScrollView>
-    </View>
+      </View>
+
+    </View >
   );
 };
 

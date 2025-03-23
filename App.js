@@ -39,6 +39,16 @@ import AllTeachersScreen from './src/Screens/AllTeacherScreen';
 import AdminPortal_Css from './src/AdminPortal_Css';
 import Dashboard from './src/Screens/Dashboard';
 import AdminProfile from './src/Screens/AdminProfile';
+import { ExamScheduleYearScreen } from './src/Screens/ExamScheduleYearScreen ';
+import { ExamScheduleDetailsScreen } from './src/Screens/ExamScheduleDetailsScreen ';
+import { ExamScheduleDepartmentScreen } from './src/Screens/ExamScheduleDepartmentScreen';
+import { SemesterReg_DepartmentListScreen } from './src/Screens/SemesterReg_DepartmentListScreen';
+import { SemesterDetailsScreen } from './src/Screens/SemesterDetailsScreen';
+import { SemesterListScreen } from './src/Screens/SemesterListScreen';
+import { NotificationScreen } from './src/Screens/NotificationScreen';
+import { AuthScreen } from './src/Screens/AuthScreen';
+import { Navigation } from './src/Screens/Navigation';
+import CreateTeacherForm from './src/Screens/CreateTeacherForm';
 
 const Stack = createNativeStackNavigator();
 function App() {
@@ -46,35 +56,40 @@ function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
 
-        <Stack.Screen name="Dashboard" component={Dashboard} />
-      <Stack.Screen name="AdminProfile" component={AdminProfile} />
 
-      
-      <Stack.Screen name="DepartmentListScreen" component={DepartmentListScreen} />
-      <Stack.Screen name="EditDepartmentScreen" component={EditDepartmentScreen} /> 
-      <Stack.Screen name="CreateDepartmentScreen" component={CreateDepartmentScreen} />
-      
-      
-      
-      
-      
-      
-      <Stack.Screen name="SemesterRegistrationView" component={SemesterRegistrationView} />
-      <Stack.Screen name="EditSemesterRegistration" component={EditSemesterRegistration} /> 
-      <Stack.Screen name="CreateSemesterRegistration" component={CreateSemesterRegistration} />
-      
-      <Stack.Screen name="ExamScheduleView" component={ExamScheduleView} /> 
-      <Stack.Screen name="CreateExamSchedule" component={CreateExamSchedule} />
-      <Stack.Screen name="EditExamSchedule" component={EditExamSchedule} />
-      
-      
-      
-      <Stack.Screen name="AllTeachersScreen" component={AllTeachersScreen} />
-      <Stack.Screen name="TeacherViewScreen" component={TeacherViewScreen} />
-      <Stack.Screen name="EditTeacherBasicInfo" component={EditTeacherBasicInfo} />
-      <Stack.Screen name="EditTeacherAttendance" component={EditTeacherAttendance} />
-      <Stack.Screen name="EditTeacherFeedback" component={EditTeacherFeedback} />
-      <Stack.Screen name="EditTeacherSchedule" component={EditTeacherSchedule} />
+        <Stack.Screen name="Dashboard" component={Dashboard} />
+        <Stack.Screen name="AdminProfile" component={AdminProfile} />
+
+        <Stack.Screen name="AuthScreen" component={AuthScreen} />
+        {/* <Stack.Screen name="Navigation" component={Navigation} /> */}
+
+
+        <Stack.Screen name="DepartmentListScreen" component={DepartmentListScreen} />
+        <Stack.Screen name="EditDepartmentScreen" component={EditDepartmentScreen} />
+        <Stack.Screen name="CreateDepartmentScreen" component={CreateDepartmentScreen} />
+
+
+
+
+
+        <Stack.Screen name="SemesterReg_DepartmentListScreen" component={SemesterReg_DepartmentListScreen} />
+        <Stack.Screen name="SemesterDetailsScreen" component={SemesterDetailsScreen} />
+        <Stack.Screen name="SemesterListScreen" component={SemesterListScreen} />
+        <Stack.Screen name="SemesterRegistrationView" component={SemesterRegistrationView} />
+        <Stack.Screen name="EditSemesterRegistration" component={EditSemesterRegistration} />
+        <Stack.Screen name="CreateSemesterRegistration" component={CreateSemesterRegistration} />
+
+
+
+
+
+        <Stack.Screen name="AllTeachersScreen" component={AllTeachersScreen} />
+        <Stack.Screen name="TeacherViewScreen" component={TeacherViewScreen} />
+        <Stack.Screen name="EditTeacherBasicInfo" component={EditTeacherBasicInfo} />
+        <Stack.Screen name="EditTeacherAttendance" component={EditTeacherAttendance} />
+        <Stack.Screen name="EditTeacherFeedback" component={EditTeacherFeedback} />
+        <Stack.Screen name="EditTeacherSchedule" component={EditTeacherSchedule} />
+        <Stack.Screen name="CreateTeacherForm" component={CreateTeacherForm} />
 
 
         <Stack.Screen name="StudentProfileView" component={StudentProfileView} />
@@ -101,13 +116,21 @@ function App() {
 
 
 
-
         <Stack.Screen name="DepartmentListScreen2" component={DepartmentListScreen2} />
         <Stack.Screen name="SemesterCoursesScreen" component={SemesterCoursesScreen} />
         <Stack.Screen name="CreateSubjectsScreen" component={CreateSubjectsScreen} />
         <Stack.Screen name="DepartmentSemestersScreen" component={DepartmentSemestersScreen} />
         <Stack.Screen name="EditCourseScreen" component={EditCourseScreen} />
 
+
+
+        <Stack.Screen name="ExamScheduleDepartmentScreen" component={ExamScheduleDepartmentScreen} />
+        <Stack.Screen name="ExamScheduleYearScreen" component={ExamScheduleYearScreen} />
+        <Stack.Screen name="ExamScheduleDetailsScreen" component={ExamScheduleDetailsScreen} />
+        <Stack.Screen name="CreateExamSchedule" component={CreateExamSchedule} />
+        <Stack.Screen name="EditExamSchedule" component={EditExamSchedule} />
+
+        <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
 
 
       </Stack.Navigator>

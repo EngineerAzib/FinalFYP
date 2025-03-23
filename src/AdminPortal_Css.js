@@ -7,12 +7,23 @@ const cardWidth = (width - 30) / 2;
 const { width: WINDOW_WIDTH } = Dimensions.get('window');
 
 const { width, height } = Dimensions.get('window');
+
+
 const AdminPortal_Css = StyleSheet.create({
-
-
-
   //add student form
-
+  AddStudentFormmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  AddStudentFormcontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  AddStudentFormscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
 
   AddStudentFormcontainer: {
     flex: 1,
@@ -125,6 +136,43 @@ const AdminPortal_Css = StyleSheet.create({
     shadowOpacity: 0.44,
     shadowRadius: 10.32,
     elevation: 16,
+  },
+  AdminProfilelogoutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  AdminProfilelogoutLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  AdminProfilelogoutText: {
+    fontSize: 16,
+    color: '#ef4444',
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+  AdminProfilelogoutButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: '#FEE2E2',
+    padding: 12,
+    borderRadius: 30,
+    zIndex: 999,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   AdminProfileavatar: {
     width: 120,
@@ -543,6 +591,7 @@ const AdminPortal_Css = StyleSheet.create({
   },
 
 
+
   CreateEventScreenformContainer: {
     padding: 16,
   },
@@ -611,10 +660,8 @@ const AdminPortal_Css = StyleSheet.create({
   CreateExamSchedulescrollContent: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+    paddingBottom: 100,
   },
-
-
   CreateExamScheduleoptionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -757,6 +804,16 @@ const AdminPortal_Css = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
   },
+  CreateInternshipScreenmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+
+  CreateInternshipScreenscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+  },
   CreateInternshipScreencontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
@@ -764,10 +821,7 @@ const AdminPortal_Css = StyleSheet.create({
   CreateInternshipScreenscrollView: {
     flex: 1,
   },
-  CreateInternshipScreencontentContainer: {
-    padding: 0,
-    paddingBottom: 32,
-  },
+
   CreateInternshipScreenformTitle: {
     fontSize: 28,
     fontWeight: '700',
@@ -821,6 +875,19 @@ const AdminPortal_Css = StyleSheet.create({
   },
 
   //create news screen 
+  CreateNewsScreenmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  CreateNewsScreencontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  CreateNewsScreenscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
   CreateNewsScreencontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
@@ -828,9 +895,7 @@ const AdminPortal_Css = StyleSheet.create({
   CreateNewsScreenscrollView: {
     flex: 1,
   },
-  CreateNewsScreenformContainer: {
-    padding: 16,
-  },
+
   CreateNewsScreencontentInput: {
     height: 150,
     paddingTop: 12,
@@ -903,9 +968,7 @@ const AdminPortal_Css = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  CreateNewsScreencontentContainer: {
-    padding: 0,
-  },
+
   CreateNewsScreenformTitle: {
     fontSize: 28,
     fontWeight: '700',
@@ -944,6 +1007,20 @@ const AdminPortal_Css = StyleSheet.create({
 
 
   //Create semester registeration
+
+  CreateSemesterRegistrationmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  CreateSemesterRegistrationcontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  CreateSemesterRegistrationscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
   CreateSemesterRegistrationcontainer: {
     flex: 1,
     backgroundColor: '#F3F4F6',
@@ -1133,6 +1210,19 @@ const AdminPortal_Css = StyleSheet.create({
   },
 
   // create subject screen
+  CreateSubjectsScreenmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  CreateSubjectsScreencontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  CreateSubjectsScreenscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
   CreateSubjectsScreencontainer: {
     flex: 1,
     backgroundColor: '#F8F9FA',
@@ -1226,23 +1316,21 @@ const AdminPortal_Css = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  CreateSubjectsScreensubmitButton: {
-    backgroundColor: '#FFB340',
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 24,
-    marginHorizontal: 8,
+  // CreateSubjectsScreensubmitButton: {
+  //   backgroundColor: '#FFB340',
+  //   paddingVertical: 16,
+  //   borderRadius: 8,
+  //   alignItems: 'center',
+  //   marginBottom: 24,
+  //   marginHorizontal: 8,
 
-  },
-  CreateSubjectsScreensubmitButtonText: {
-    color: '#000000',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  CreateSubjectsScreencontentContainer: {
-    padding: 0,
-  },
+  // },
+  // CreateSubjectsScreensubmitButtonText: {
+  //   color: '#000000',
+  //   fontSize: 16,
+  //   fontWeight: '600',
+  // },
+
   CreateSubjectsScreenformTitle: {
     fontSize: 28,
     fontWeight: '700',
@@ -1551,6 +1639,19 @@ const AdminPortal_Css = StyleSheet.create({
     color: '#4A6BD6',
   },
   // edit course screen
+  EditCourseScreenmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  EditCourseScreencontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  EditCourseScreenscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
   EditCourseScreencontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
@@ -1561,26 +1662,9 @@ const AdminPortal_Css = StyleSheet.create({
   EditCourseScreenformContainer: {
     padding: 16,
   },
-  EditCourseScreenupdateButton: {
-    backgroundColor: '#6C63FF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderRadius: 25,
-    marginTop: 15,
-    marginBottom: 16,
-    height: 55,
-    gap: 8,
-  },
-  EditCourseScreenupdateButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  EditCourseScreencontentContainer: {
-    padding: 0,
-  },
+
+
+
 
   EditCourseScreenlegendContainer: {
     flexDirection: 'row',
@@ -1623,6 +1707,20 @@ const AdminPortal_Css = StyleSheet.create({
   },
 
   // edit department screeen
+
+  EditDepartmentScreenmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  EditDepartmentScreencontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  EditDepartmentScreenscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
   EditDepartmentScreensafeArea: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -1695,6 +1793,19 @@ const AdminPortal_Css = StyleSheet.create({
   // },
 
   // edit event screen
+  EditEventScreenmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  EditEventScreencontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  EditEventScreenscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+  },
   EditEventScreencontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
@@ -1722,9 +1833,7 @@ const AdminPortal_Css = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  EditEventScreencontentContainer: {
-    padding: 0,
-  },
+
   EditEventScreenformTitle: {
     fontSize: 28,
     fontWeight: '700',
@@ -1762,14 +1871,21 @@ const AdminPortal_Css = StyleSheet.create({
   },
 
   // edit exam schedule screen
-  EditExamSchedulecontainer: {
+  EditExamSchedulemainContainer: {
     flex: 1,
-    backgroundColor: '#F5F6FA',
+    backgroundColor: '#FFFFFF',
   },
-  EditExamSchedulescrollView: {
+  EditExamSchedulecontentContainer: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#F8F9FA',
   },
+  EditExamSchedulescrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+  },
+
+
   EditExamScheduleheaderInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1818,26 +1934,8 @@ const AdminPortal_Css = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
   },
-  EditExamScheduleslotHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  EditExamScheduleslotTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1A1F36',
-  },
-  EditExamScheduleformGroup: {
-    marginBottom: 16,
-  },
-  EditExamSchedulelabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#6B7280',
-    marginBottom: 8,
-  },
+
+
   EditExamScheduleaddButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1856,50 +1954,60 @@ const AdminPortal_Css = StyleSheet.create({
   EditExamScheduleremoveButton: {
     padding: 4,
   },
-  EditExamSchedulebuttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  EditExamSchedulebutton: {
-    flex: 1,
-  },
 
-  // edit internship screen
-  EditInternshipScreencontainer: {
-    flex: 1,
-    backgroundColor: '#F5F6FA',
+
+  EditExamScheduleformTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#212529',
+    textAlign: 'center',
+    marginBottom: 24,
+    marginTop: 8,
+
   },
-  EditInternshipScreenscrollView: {
-    flex: 1,
-  },
-  EditInternshipScreenformContainer: {
-    padding: 16,
-    gap: 16,
-  },
-  EditInternshipScreenupdateButton: {
-    backgroundColor: '#6C63FF',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 24,
-    marginBottom: 32,
-  },
-  EditInternshipScreenbuttonContent: {
+  EditExamSchedulelegendContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    gap: 24,
+    marginBottom: 32,
+  },
+  EditExamSchedulelegendItem: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  EditInternshipScreenupdateButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+  EditExamSchedulelegendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  EditExamSchedulerequiredDot: {
+    backgroundColor: '#6C63FF',
+  },
+  EditExamScheduleoptionalDot: {
+    backgroundColor: '#ADB5BD',
+  },
+  EditExamSchedulelegendText: {
+    color: '#495057',
+    fontSize: 14,
+  },
+
+
+  // edit internship screen
+  EditInternshipScreenmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   EditInternshipScreencontentContainer: {
-    padding: 0,
+    flex: 1,
+    backgroundColor: '#F8F9FA',
   },
+  EditInternshipScreenscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
+
   EditInternshipScreenformTitle: {
     fontSize: 28,
     fontWeight: '700',
@@ -1909,6 +2017,7 @@ const AdminPortal_Css = StyleSheet.create({
     marginTop: 8,
 
   },
+
   EditInternshipScreenlegendContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -1936,10 +2045,20 @@ const AdminPortal_Css = StyleSheet.create({
     fontSize: 14,
   },
   // edit news 
-  EditNewsScreencontainer: {
+  EditNewsScreenmainContainer: {
     flex: 1,
-    backgroundColor: '#F5F6FA',
+    backgroundColor: '#FFFFFF',
   },
+  EditNewsScreencontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  EditNewsScreenscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
+
   EditNewsScreenscrollView: {
     flex: 1,
   },
@@ -1972,9 +2091,7 @@ const AdminPortal_Css = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  EditNewsScreencontentContainer: {
-    padding: 0,
-  },
+
   EditNewsScreenformTitle: {
     fontSize: 28,
     fontWeight: '700',
@@ -2012,6 +2129,42 @@ const AdminPortal_Css = StyleSheet.create({
   },
 
   // edit semester registeration
+  EditSemesterRegistrationheaderInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  EditSemesterRegistrationinfoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  EditSemesterRegistrationinfoText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1A1F36',
+  },
+  EditSemesterRegistrationmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  EditSemesterRegistrationcontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  EditSemesterRegistrationscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
   EditSemesterRegistrationcontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
@@ -2193,6 +2346,19 @@ const AdminPortal_Css = StyleSheet.create({
   },
 
   // edit student academics
+  EditStudentAcademicsmainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  EditStudentAcademicscontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  EditStudentAcademicsscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+  },
   EditStudentAcademicscontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
@@ -2300,6 +2466,53 @@ const AdminPortal_Css = StyleSheet.create({
 
 
   // edit student attendance
+  EditStudentAttendanceformTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#212529',
+    textAlign: 'center',
+    marginBottom: 24,
+    marginTop: 8
+  },
+  EditStudentAttendancelegendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 24,
+    marginBottom: 32,
+  },
+  EditStudentAttendancelegendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  EditStudentAttendancelegendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  EditStudentAttendancerequiredDot: {
+    backgroundColor: '#6C63FF',
+  },
+  EditStudentAttendanceoptionalDot: {
+    backgroundColor: '#ADB5BD',
+  },
+  EditStudentAttendancelegendText: {
+    color: '#495057',
+    fontSize: 14,
+  },
+  EditStudentAttendancemainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  EditStudentAttendancecontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  EditStudentAttendancescrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100,
+  },
   EditStudentAttendancecontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
@@ -2318,12 +2531,12 @@ const AdminPortal_Css = StyleSheet.create({
   EditStudentAttendancesection: {
     marginBottom: 24,
   },
-  EditStudentAttendancesectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1F36',
-    marginBottom: 16,
-  },
+  // EditStudentAttendancesectionTitle: {
+  //   fontSize: 18,
+  //   fontWeight: '600',
+  //   color: '#1A1F36',
+  //   marginBottom: 16,
+  // },
   EditStudentAttendanceformField: {
     marginBottom: 16,
     backgroundColor: '#FFFFFF',
@@ -2384,14 +2597,24 @@ const AdminPortal_Css = StyleSheet.create({
 
 
   // edit student basic info
+  EditStudentBasicInfomainContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  EditStudentBasicInfocontentContainer: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+  },
+  EditStudentBasicInfoscrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+  },
   EditStudentBasicInfocontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
   },
-  EditStudentBasicInfoscrollView: {
-    flex: 1,
-    padding: 16,
-  },
+
   EditStudentBasicInfobuttonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -2439,6 +2662,22 @@ const AdminPortal_Css = StyleSheet.create({
   },
   EditStudentBasicInfolegendText: {
     color: '#495057',
+    fontSize: 14,
+  },
+  EditStudentBasicInfoprofilePhotoPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#6C63FF',
+    borderStyle: 'dashed',
+  },
+  EditStudentBasicInfoprofilePhotoPlaceholderText: {
+    color: '#6C63FF',
+    marginTop: 8,
     fontSize: 14,
   },
 
@@ -2788,6 +3027,7 @@ const AdminPortal_Css = StyleSheet.create({
   },
   EditTeacherScheduleformContainer: {
     gap: 16,
+    
   },
   EditTeacherSchedulefullWidthInput: {
     width: '100%',
@@ -2965,125 +3205,90 @@ const AdminPortal_Css = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  ExamScheduleViewdepartmentWrapper: {
-    marginBottom: 16,
-  },
-  ExamScheduleViewseparator: {
-    marginVertical: 24,
-    paddingHorizontal: 16,
-  },
-  ExamScheduleViewseparatorLine: {
-    height: 1,
-    backgroundColor: '#E5E7EB',
-  },
+  // Department card styles - aligned with semester registration
   ExamScheduleViewdepartmentCard: {
-    backgroundColor: '#6C63FF',
-    borderRadius: 16,
+    backgroundColor: 'white',
+    borderRadius: 12,
     overflow: 'hidden',
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  ExamScheduleViewdepartmentCardExpanded: {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    marginBottom: 5,
   },
   ExamScheduleViewdepartmentHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#EEF0FB',
   },
   ExamScheduleViewdepartmentTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-  ExamScheduleViewiconContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    padding: 8,
-  },
   ExamScheduleViewdepartmentTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#F5F6FA',
+    color: '#1A1F36',
   },
-  ExamScheduleViewyearsContainer: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  ExamScheduleViewyearWrapper: {
-    marginBottom: 12,
-  },
+  // Year card styles
   ExamScheduleViewyearCard: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: 'white',
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  ExamScheduleViewyearCardExpanded: {
-    borderBottomWidth: 0,
+    borderColor: '#EEF0FB',
+    marginBottom: 20,
   },
   ExamScheduleViewyearHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#6C63FF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEF0FB',
   },
   ExamScheduleViewyearTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-  ExamScheduleViewyearIconContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 8,
-    padding: 6,
-  },
   ExamScheduleViewyearTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#F5F6FA',
+    color: '#1A1F36',
   },
-  ExamScheduleViewyearActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
+  // Edit button styles - consistent across screens
   ExamScheduleVieweditButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    padding: 4,
+    backgroundColor: '#EEF0FB',
     borderRadius: 8,
-    padding: 6,
+    marginLeft: 90,
   },
-  ExamScheduleViewscheduleContainer: {
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-  },
+  // Date schedule styles
   ExamScheduleViewdateSchedule: {
     marginBottom: 24,
   },
   ExamScheduleViewdateHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F9FAFB',
     padding: 12,
     borderRadius: 8,
     marginBottom: 16,
     gap: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#EEF0FB',
   },
   ExamScheduleViewdateText: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#1F2937',
+    color: '#1A1F36',
   },
+  // Exam slot styles
   ExamScheduleViewslotsContainer: {
     gap: 16,
   },
@@ -3112,7 +3317,7 @@ const AdminPortal_Css = StyleSheet.create({
   ExamScheduleViewtimelineLine: {
     width: 2,
     height: '100%',
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#EEF0FB',
     position: 'absolute',
     top: 32,
     left: '50%',
@@ -3120,17 +3325,20 @@ const AdminPortal_Css = StyleSheet.create({
   },
   ExamScheduleViewexamDetails: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#F9FAFB',
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#EEF0FB',
+  },
+  ExamScheduleViewseparator: {
+    height: 24,
+    backgroundColor: '#F5F6FA',
   },
   ExamScheduleViewcourseCode: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 4,
+    color: '#1A1F36',
   },
   ExamScheduleViewcourseName: {
     fontSize: 14,
@@ -3305,6 +3513,8 @@ const AdminPortal_Css = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
+    marginBottom: 5,
+
   },
   SemesterRegistrationViewdepartmentHeader: {
     flexDirection: 'row',
@@ -3332,6 +3542,7 @@ const AdminPortal_Css = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#EEF0FB',
+    marginBottom: 20,
   },
   SemesterRegistrationViewcardHeader: {
     flexDirection: 'row',
@@ -4978,12 +5189,14 @@ const AdminPortal_Css = StyleSheet.create({
   FormFieldformFieldContainer: {
     marginVertical: 20,
     width: '100%',
+    
   },
   FormFieldlabelContainer: {
     position: 'absolute',
     top: -10,
     left: 16,
     zIndex: 1,
+    
   },
   FormFieldlabelText: {
     fontSize: 14,
@@ -5009,11 +5222,7 @@ const AdminPortal_Css = StyleSheet.create({
   },
   FormFieldinputWrapperFocused: {
     borderColor: '#6C63FF',
-    shadowColor: '#6C63FF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 1,
+
   },
   FormFieldtextInput: {
     flex: 1,
@@ -5655,11 +5864,9 @@ const AdminPortal_Css = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 20,
-    // Remove marginHorizontal to give more control
     marginBottom: 24,
-    // Make width more flexible
-    width: WINDOW_WIDTH - 10, // Default 20px padding on each side
-    alignSelf: 'center', // Center the container
+    width: WINDOW_WIDTH - 10, 
+    alignSelf: 'center', 
     ...Platform.select({
       ios: {
         shadowColor: '#000',

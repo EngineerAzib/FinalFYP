@@ -6,6 +6,7 @@ import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import { SectionContainer } from '../Components/SectionContainer';
 import styles from '../AdminPortal_Css';
+import { CustomButton } from '../Components/CustomButton';
 
 export const EditInternshipScreen = ({ route, navigation }) => {
   const { internshipData } = route.params;
@@ -51,7 +52,9 @@ export const EditInternshipScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.EditInternshipScreencontainer}>
+    // IMPORTANT: The root View must have flex: 1 to fill the screen
+    // This allows us to properly position the footer at the bottom
+    <View style={styles.EditInternshipScreenmainContainer}>
       <Header />
       <CustomHeader
         title="Internships"
@@ -61,9 +64,13 @@ export const EditInternshipScreen = ({ route, navigation }) => {
         navigation={navigation}
       />
 
-      <ScrollView style={styles.EditInternshipScreenscrollView}>
-        <View style={styles.EditInternshipScreencontentContainer}>
-          <Text style={styles.EditInternshipScreenformTitle}>Edit Internship</Text>
+      <View style={styles.EditInternshipScreencontentContainer}>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.EditInternshipScreenscrollContent}
+        >
+          <Text style={styles.EditInternshipScreenformTitle}>Revise Internship</Text>
 
           <View style={styles.EditInternshipScreenlegendContainer}>
             <View style={styles.EditInternshipScreenlegendItem}>
@@ -215,19 +222,29 @@ export const EditInternshipScreen = ({ route, navigation }) => {
               textAlignVertical="top"
             />
 
-            <TouchableOpacity
-              style={styles.EditInternshipScreenupdateButton}
-              onPress={handleUpdate}
-            >
-              <View style={styles.EditInternshipScreenbuttonContent}>
-                <MaterialIcons name="check" size={24} color="white" />
-                <Text style={styles.EditInternshipScreenupdateButtonText}>Update Internship</Text>
-              </View>
-            </TouchableOpacity>
+
           </SectionContainer>
 
+        </ScrollView>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+          <CustomButton
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Edit Internship",
+                onPress: handleUpdate,
+                variant: "primary",
+              }
+            ]}
+          />
         </View>
-      </ScrollView>
+      </View>
+
     </View>
+
   );
 };

@@ -70,3 +70,16 @@ export const EventListScreen = ({ navigation }) => {
     </View>
   );
 };
+// CreateDepartmentScreenmainContainer: {
+//   flex: 1,
+//   backgroundColor: '#FFFFFF',
+// },
+// CreateDepartmentScreencontentContainer: {
+//   flex: 1,
+//   backgroundColor: '#F8F9FA',
+// },
+// CreateDepartmentScreenscrollContent: {
+//   paddingHorizontal: 20,
+//   paddingTop: 20,
+//   paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+// },

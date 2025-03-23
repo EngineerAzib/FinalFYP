@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import { View, ScrollView, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import { SectionContainer } from '../Components/SectionContainer';
-import Button from '../Components/Button';
 import styles from '../AdminPortal_Css';
+import { CustomButton } from '../Components/CustomButton';
 
 export const EditStudentAttendance = ({ route, navigation }) => {
   const { studentData } = route.params;
-
   const [formData, setFormData] = useState({
-    courses: [],
-
-    overallAttendance: studentData.overallAttendance?.toString() || '',
-    courses: studentData.currentSemesterCourses?.map(course => ({
+    overallAttendance: studentData.currentSemester?.overallAttendance?.toString() || '',
+    courses: studentData.currentSemester?.courses?.map(course => ({
       code: course.code || '',
       name: course.name || '',
       totalClasses: course.totalClasses?.toString() || '',
       attendedClasses: course.attendedClasses?.toString() || '',
-      attendancePercentage: course.attendancePercentage?.toString() || ''
-    })) || []
+      percentage: course.percentage?.toString() || '', 
+    })) || [],
   });
+
   useEffect(() => {
     if (studentData && studentData.currentSemester) {
       setFormData({
-        courses: studentData.currentSemester.courses
+        overallAttendance: studentData.currentSemester.overallAttendance?.toString() || '',
+        courses: studentData.currentSemester.courses.map(course => ({
+          code: course.code || '',
+          name: course.name || '',
+          totalClasses: course.totalClasses?.toString() || '',
+          attendedClasses: course.attendedClasses?.toString() || '',
+          percentage: course.percentage?.toString() || '', 
+        })),
       });
     }
   }, [studentData]);
+  
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,29 +55,19 @@ export const EditStudentAttendance = ({ route, navigation }) => {
     formData.courses.forEach((course, index) => {
       const totalClasses = parseInt(course.totalClasses);
       const attendedClasses = parseInt(course.attendedClasses);
-      const attendancePercentage = parseFloat(course.attendancePercentage);
+      const percentage = parseFloat(course.percentage);
 
-      if (!course.totalClasses) {
-        newErrors[`course_${index}_total`] = 'Required';
-      } else if (isNaN(totalClasses) || totalClasses < 0) {
-        newErrors[`course_${index}_total`] = 'Invalid';
-      }
+      if (!course.totalClasses) newErrors[`course_${index}_total`] = 'Required';
+      else if (isNaN(totalClasses) || totalClasses < 0) newErrors[`course_${index}_total`] = 'Invalid';
 
-      if (!course.attendedClasses) {
-        newErrors[`course_${index}_attended`] = 'Required';
-      } else if (isNaN(attendedClasses) || attendedClasses < 0) {
-        newErrors[`course_${index}_attended`] = 'Invalid';
-      }
+      if (!course.attendedClasses) newErrors[`course_${index}_attended`] = 'Required';
+      else if (isNaN(attendedClasses) || attendedClasses < 0) newErrors[`course_${index}_attended`] = 'Invalid';
 
-      if (attendedClasses > totalClasses) {
-        newErrors[`course_${index}_attended`] = 'Cannot exceed total classes';
-      }
+      if (attendedClasses > totalClasses) newErrors[`course_${index}_attended`] = 'Cannot exceed total classes';
 
-      if (!course.attendancePercentage) {
-        newErrors[`course_${index}_percentage`] = 'Required';
-      } else if (isNaN(attendancePercentage) || attendancePercentage < 0 || attendancePercentage > 100) {
+      if (!course.percentage) newErrors[`course_${index}_percentage`] = 'Required';
+      else if (isNaN(percentage) || percentage < 0 || percentage > 100)
         newErrors[`course_${index}_percentage`] = 'Invalid percentage';
-      }
     });
 
     setErrors(newErrors);
@@ -82,7 +78,8 @@ export const EditStudentAttendance = ({ route, navigation }) => {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        // API call would go here
+        // Simulated API delay
+        console.log('Updated Attendance Data:', formData);
         await new Promise(resolve => setTimeout(resolve, 1000));
         navigation.goBack();
       } catch (error) {
@@ -95,39 +92,39 @@ export const EditStudentAttendance = ({ route, navigation }) => {
 
   const updateCourseField = (index, field, value) => {
     setFormData(prev => {
-      const newData = { ...prev };
-      newData.courses[index][field] = value;
+      const newCourses = [...prev.courses];
+      newCourses[index][field] = value;
 
       // Auto-calculate attendance percentage
       if (field === 'totalClasses' || field === 'attendedClasses') {
-        const total = parseInt(newData.courses[index].totalClasses) || 0;
-        const attended = parseInt(newData.courses[index].attendedClasses) || 0;
-        if (total > 0) {
-          newData.courses[index].attendancePercentage = ((attended / total) * 100).toFixed(1);
-        }
+        const total = parseInt(newCourses[index].totalClasses) || 0;
+        const attended = parseInt(newCourses[index].attendedClasses) || 0;
+        newCourses[index].percentage = total > 0 ? ((attended / total) * 100).toFixed(1) : '';
       }
 
-      return newData;
+      return { ...prev, courses: newCourses };
     });
   };
 
   return (
-    <View style={styles.EditStudentAttendancecontainer}>
+    <View style={styles.EditStudentAttendancemainContainer}>
       <Header />
       <CustomHeader
         title="Students"
-        currentScreen="Edit Student Attendance"
+        currentScreen="Edit Attendance"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
 
-      <ScrollView style={styles.EditStudentAttendancescrollView}>
-        <Text style={styles.EditStudentAttendancepageTitle}>Edit Student Attendance</Text>
+      <View style={styles.EditDepartmentScreencontentContainer}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.EditDepartmentScreenscrollContent}
+        >
+          <Text style={styles.EditStudentAttendanceformTitle}>Edit Student Attendance</Text>
 
-        <View style={styles.EditStudentAttendancesection}>
-          <Text style={styles.EditStudentAttendancesectionTitle}>Overall Attendance</Text>
-          <View style={styles.EditStudentAttendanceformField}>
+          <SectionContainer sectionNumber="1" title="Overall Attendance">
             <FormField
               label="Current Semester Attendance (%)"
               value={formData.overallAttendance}
@@ -137,19 +134,16 @@ export const EditStudentAttendance = ({ route, navigation }) => {
               keyboardType="decimal-pad"
               error={errors.overallAttendance}
             />
-          </View>
-        </View>
+          </SectionContainer>
 
-        <View style={styles.EditStudentAttendancesection}>
-          <Text style={styles.EditStudentAttendancesectionTitle}>Course-wise Attendance</Text>
-          {formData.courses.map((course, index) => (
-            <View key={index} style={styles.EditStudentAttendancecourseCard}>
-              <View style={styles.EditStudentAttendancecourseHeader}>
-                <Text style={styles.EditStudentAttendancecourseCode}>{course.code}</Text>
-                <Text style={styles.EditStudentAttendancecourseName}>{course.name}</Text>
-              </View>
+          <SectionContainer sectionNumber="2" title="Course-wise Attendance">
+            {formData.courses.map((course, index) => (
+              <View key={index} style={styles.EditStudentAttendancecourseCard}>
+                <View style={styles.EditStudentAttendancecourseHeader}>
+                  <Text style={styles.EditStudentAttendancecourseCode}>{course.code}</Text>
+                  <Text style={styles.EditStudentAttendancecourseName}>{course.name}</Text>
+                </View>
 
-              <View style={styles.EditStudentAttendanceformField}>
                 <FormField
                   label="Total Classes"
                   value={course.totalClasses}
@@ -159,9 +153,7 @@ export const EditStudentAttendance = ({ route, navigation }) => {
                   keyboardType="numeric"
                   error={errors[`course_${index}_total`]}
                 />
-              </View>
 
-              <View style={styles.EditStudentAttendanceformField}>
                 <FormField
                   label="Classes Attended"
                   value={course.attendedClasses}
@@ -171,56 +163,46 @@ export const EditStudentAttendance = ({ route, navigation }) => {
                   keyboardType="numeric"
                   error={errors[`course_${index}_attended`]}
                 />
-              </View>
 
-              <View style={styles.EditStudentAttendanceformField}>
                 <FormField
                   label="Attendance %"
-                  value={course.attendancePercentage}
-                  onChangeText={(text) => updateCourseField(index, 'attendancePercentage', text)}
+                  value={course.percentage}
                   placeholder="0.0"
                   required
                   keyboardType="decimal-pad"
                   editable={false}
                   error={errors[`course_${index}_percentage`]}
                 />
-              </View>
 
-              <View style={styles.EditStudentAttendancestatusBar}>
-                <MaterialIcons
-                  name={parseFloat(course.attendancePercentage) >= 75 ? "check-circle" : "warning"}
-                  size={20}
-                  color={parseFloat(course.attendancePercentage) >= 75 ? "#22C55E" : "#EF4444"}
-                />
-                <Text style={[
-                  styles.EditStudentAttendancestatusText,
-                  { color: parseFloat(course.attendancePercentage) >= 75 ? "#22C55E" : "#EF4444" }
-                ]}>
-                  {parseFloat(course.attendancePercentage) >= 75 ? "Attendance criteria met" : "Low attendance"}
-                </Text>
+                <View style={styles.EditStudentAttendancestatusBar}>
+                  <MaterialIcons
+                    name={parseFloat(course.percentage) >= 75 ? "check-circle" : "warning"}
+                    size={20}
+                    color={parseFloat(course.percentage) >= 75 ? "#22C55E" : "#EF4444"}
+                  />
+                  <Text
+                    style={[
+                      styles.EditStudentAttendancestatusText,
+                      { color: parseFloat(course.percentage) >= 75 ? "#22C55E" : "#EF4444" },
+                    ]}
+                  >
+                    {parseFloat(course.percentage) >= 75 ? "Attendance criteria met" : "Low attendance"}
+                  </Text>
+                </View>
               </View>
-            </View>
-          ))}
-        </View>
+            ))}
+          </SectionContainer>
+        </ScrollView>
 
-        <View style={styles.EditStudentAttendancebuttonRow}>
-          <Button
-            title="Cancel"
-            onPress={() => navigation.goBack()}
-            variant="secondary"
-            style={styles.EditStudentAttendancebutton}
-            disabled={isSubmitting}
-          />
-          <Button
-            title="Save Changes"
-            onPress={handleSave}
-            variant="primary"
-            style={styles.EditStudentAttendancebutton}
-            loading={isSubmitting}
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+          <CustomButton
+            buttons={[
+              { title: "Cancel", onPress: () => navigation.goBack(), variant: "secondary" },
+              { title: "Edit Attendance", onPress: handleSave, variant: "primary", disabled: isSubmitting },
+            ]}
           />
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
-

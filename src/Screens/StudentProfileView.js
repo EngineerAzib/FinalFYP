@@ -75,6 +75,121 @@ export const StudentProfileView = ({ route, navigation }) => {
       </View>
     );
   };
+  const studentData = {
+    basicInfo: {
+      name: "John Doe",
+      profilePhoto: "https://example.com/placeholder.jpg", // Add profile photo URL
+      enrollmentNo: "2021-SE-01",
+      rollNo: "21SW01",
+      department: "Software Engineering",
+      semester: 4,
+      section: "A"
+    },
+    academics: {
+      currentCGPA: 3.75,
+      semesterGPAs: [
+        {
+          semester: 1,
+          gpa: 3.80,
+          courses: [
+            { code: "CS101", name: "Programming Fundamentals", creditHours: 3, grade: "A" },
+            { code: "MT101", name: "Calculus", creditHours: 3, grade: "A-" },
+            { code: "ENG101", name: "English Composition", creditHours: 3, grade: "A" }
+          ]
+        },
+        {
+          semester: 2,
+          gpa: 3.70,
+          courses: [
+            { code: "CS102", name: "Object Oriented Programming", creditHours: 3, grade: "A-" },
+            { code: "DS101", name: "Data Structures", creditHours: 3, grade: "A" },
+            { code: "MT102", name: "Linear Algebra", creditHours: 3, grade: "B+" }
+          ]
+        },
+        {
+          semester: 3,
+          gpa: 3.75,
+          courses: [
+            { code: "CS201", name: "Database Systems", creditHours: 3, grade: "A" },
+            { code: "SE201", name: "Software Requirements", creditHours: 3, grade: "A-" },
+            { code: "CS203", name: "Computer Networks", creditHours: 3, grade: "A-" }
+          ]
+        }
+      ]
+    },
+    attendance: {
+      currentSemester: {
+        overallAttendance: 90.5,
+        courses: [
+          {
+            code: "SE301",
+            name: "Software Design & Architecture",
+            creditHours: 3,
+            totalClasses: 44,
+            attendedClasses: 40,
+            percentage: 90.91, // This field is named "percentage"
+          },
+          {
+            code: "SE301",
+            name: "Software Design & Architecture",
+            creditHours: 3,
+            totalClasses: 44,
+            attendedClasses: 40,
+            percentage: 90.91, // This field is named "percentage"
+          },
+          {
+            code: "SE301",
+            name: "Software Design & Architecture",
+            creditHours: 3,
+            totalClasses: 44,
+            attendedClasses: 40,
+            percentage: 90.91, // This field is named "percentage"
+          },
+        ]
+      }
+    }
+  };
+
+  //Component for Toggle 
+  const CardHeader = ({ title, icon, isExpanded, setIsExpanded, onEdit }) => (
+    <View style={styles.StudentProfileViewcardHeader}>
+      <TouchableOpacity
+        style={styles.StudentProfileViewcardTitleContainer}
+        onPress={() => setIsExpanded(!isExpanded)}
+      >
+        <MaterialIcons name={icon} size={24} color="#6C63FF" />
+        <Text style={styles.StudentProfileViewcardTitle}>{title}</Text>
+        <MaterialIcons
+          name={isExpanded ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+          size={24}
+          color="#6C63FF"
+        />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onEdit}>
+        <MaterialIcons name="edit" size={24} color="#6C63FF" />
+      </TouchableOpacity>
+    </View>
+  );
+
+  const handleEditBasicInfo = () => {
+    navigation.navigate('EditStudentBasicInfo', { studentData: studentData.basicInfo });
+  };
+
+
+  const handleEditAcademics = () => {
+    navigation.navigate('EditStudentAcademics', { studentData: studentData.academics });
+  };
+
+  const handleEditAttendance = () => {
+    navigation.navigate('EditStudentAttendance', { 
+      studentData: studentData.attendance // Pass the attendance data
+    });
+  };
+  const getAttendanceColor = (percentage) => {
+    if (percentage >= 90) return '#10B981';
+    if (percentage >= 75) return '#6366F1';
+    return '#EF4444';
+  };
 
   const getGradeColor = (grade) => {
     switch (grade[0]) {

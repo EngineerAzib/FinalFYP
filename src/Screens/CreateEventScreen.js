@@ -49,7 +49,7 @@ export const CreateEventScreen = ({ navigation }) => {
     <View style={styles.CreateEventScreenmainContainer}>
       <Header />
       <CustomHeader
-        title="Events "
+        title="Events"
         currentScreen="Create New Event"
         showSearch={false}
         showRefresh={false}
@@ -64,7 +64,7 @@ export const CreateEventScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.CreateEventScreenscrollContent}
         >
-          <Text style={styles.CreateEventScreenformTitle}>Create Event</Text>
+          <Text style={styles.CreateEventScreenformTitle}>Add Event</Text>
 
           <View style={styles.CreateEventScreenlegendContainer}>
             <View style={styles.CreateEventScreenlegendItem}>
@@ -76,7 +76,7 @@ export const CreateEventScreen = ({ navigation }) => {
               <Text style={styles.CreateEventScreenlegendText}>Optional</Text>
             </View>
           </View>
-          <SectionContainer sectionNumber="1" title="Student Information">
+          <SectionContainer sectionNumber="1" title="Publish Event">
 
             <FormField
               label="Event Title"
@@ -172,13 +172,21 @@ export const CreateEventScreen = ({ navigation }) => {
           </SectionContainer>
 
         </ScrollView>
-        <View style={styles.EditDepartmentScreenbuttonContainer}>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
-            title="Create Event"
-            onPress={handleSubmit}
-            disabled={false}
+            buttons={[
+              {
+                title: "Cancel",
+                onPress: () => navigation.goBack(),
+                variant: "secondary",
+              },
+              {
+                title: "Create Event",
+                onPress: handleSubmit,
+                variant: "primary",
+              }
+            ]}
           />
-
         </View>
       </View >
 

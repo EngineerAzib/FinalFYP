@@ -36,9 +36,9 @@ export const SemesterCoursesScreen = ({ route }) => {
             departmentName={department.name} 
             semester={semester} 
           />
-          
-          ))}
-        </ScrollView>
-      </View>
-    );
-  };
+
+        ))}
+      </ScrollView>
+    </View>
+  );
+};

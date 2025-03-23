@@ -6,7 +6,8 @@ import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import { SectionContainer } from '../Components/SectionContainer';
 import Button from '../Components/Button';
-// import styles from '../AdminPortal_Css';
+import styles from '../AdminPortal_Css';
+import { CustomButton } from '../Components/CustomButton';
 
 export const EditStudentAcademics = ({ route, navigation }) => {
   const { studentData } = route.params;
@@ -90,20 +91,22 @@ export const EditStudentAcademics = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.EditStudentAcademicscontainer}>
+    <View style={styles.EditStudentAcademicsmainContainer}>
       <Header />
       <CustomHeader
         title="Students"
-        currentScreen="Edit Academic Details"
+        currentScreen="Edit Academics"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
 
-
-      <ScrollView >
-        <View style={styles.EditStudentAcademicscontentContainer}>
-          <Text style={styles.EditStudentAcademicsformTitle}>Edit Course</Text>
+      <View style={styles.EditStudentAcademicscontentContainer}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.EditStudentAcademicsscrollContent}
+        >
+          <Text style={styles.EditStudentAcademicsformTitle}>Edit Student Academics</Text>
 
           <View style={styles.EditStudentAcademicslegendContainer}>
             <View style={styles.EditStudentAcademicslegendItem}>
@@ -198,26 +201,29 @@ export const EditStudentAcademics = ({ route, navigation }) => {
             </SectionContainer>
           ))}
 
-          <View style={styles.EditStudentAcademicsbuttonContainer}>
-            <Button
-              title="Cancel"
-              onPress={() => navigation.goBack()}
-              variant="secondary"
-              style={styles.EditStudentAcademicsbutton}
-              disabled={isSubmitting}
-            />
-            <Button
-              title="Save Changes"
-              onPress={handleSave}
-              variant="primary"
-              style={styles.EditStudentAcademicsbutton}
-              loading={isSubmitting}
+
+        </ScrollView>
+        <View style={styles.CreateExamSchedulebuttonContainer}>
+            <CustomButton
+              buttons={[
+                {
+                  title: "Cancel",
+                  onPress: () => navigation.goBack(),
+                  variant: "secondary",
+                },
+                {
+                  title: "Edit Academics",
+                  onPress: handleSave,
+                  variant: "primary",
+                }
+              ]}
             />
           </View>
-        </View>
+      </View>
 
-      </ScrollView>
     </View>
+
+
   );
 };
 

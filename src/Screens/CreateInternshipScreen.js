@@ -55,22 +55,20 @@ export const CreateInternshipScreen = ({ navigation }) => {
     <View style={styles.CreateInternshipScreenmainContainer}>
       <Header />
       <CustomHeader
-        title="Internship"
+        title="Internships"
         currentScreen="Create Internship"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
 
-      {/* Content container needs flex: 1 to properly fill available space */}
       <View style={styles.CreateInternshipScreencontentContainer}>
-        {/* ScrollView should not have flex: 1 in its style prop */}
-        {/* Instead, it should naturally fill the space between header and footer */}
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.CreateInternshipScreenscrollContent}
         >
-          <Text style={styles.CreateInternshipScreenformTitle}>Create Internship</Text>
+          <Text style={styles.CreateInternshipScreenformTitle}>Create New Internship</Text>
 
           <View style={styles.CreateInternshipScreenlegendContainer}>
             <View style={styles.CreateInternshipScreenlegendItem}>
@@ -224,22 +222,20 @@ export const CreateInternshipScreen = ({ navigation }) => {
           </SectionContainer>
 
         </ScrollView >
-        {/* <View style={styles.EditDepartmentScreenbuttonContainer}>
-          <CustomButton
-            title="Create Department"
-            onPress={handleCreate}
-            variant= "primary"
-          />
-        </View > */}
+
         <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
             buttons={[
               {
                 title: "Cancel",
                 onPress: () => navigation.goBack(),
-                variant: "primary",
+                variant: "secondary",
               },
-
+              {
+                title: "Create Internship",
+                onPress: handleCreate,
+                variant: "primary",
+              }
             ]}
           />
         </View>
