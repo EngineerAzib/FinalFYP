@@ -17,6 +17,7 @@ export const ExamScheduleDepartmentScreen = ({ navigation }) => {
       try {
         const data = await ExaminationScheduleDepList(); // Call the function with ()
         setDepartments(data);
+        console.log(data)
       } catch (err) {
         setError(err);
       } finally {

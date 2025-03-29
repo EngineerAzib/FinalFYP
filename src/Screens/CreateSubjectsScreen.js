@@ -30,6 +30,9 @@ const CreateSubjectsScreen = ({ navigation }) => {
       semesterId: '',
       teacherId: '',
       prerequisiteIds: [], // Ensure this is always an array
+      startDate: null, // Add startDate
+      endDate: null,   // Add endDate
+      days: '',        // Add days
     },
   ]);
 
@@ -84,6 +87,9 @@ const CreateSubjectsScreen = ({ navigation }) => {
         semesterId: '',
         teacherId: '',
         prerequisiteIds: [], // Ensure this is always an array
+        startDate: null, // Add startDate
+        endDate: null,   // Add endDate
+        days: '',        // Add days
       },
     ]);
   };
@@ -112,6 +118,15 @@ const CreateSubjectsScreen = ({ navigation }) => {
     if (!Array.isArray(subject.prerequisiteIds)) {
       throw new Error('Prerequisite IDs must be an array.');
     }
+    if (!subject.startDate) {
+      throw new Error('Start date is required.');
+    }
+    if (!subject.endDate) {
+      throw new Error('End date is required.');
+    }
+    if (!subject.days) {
+      throw new Error('Days are required.');
+    }
   };
 
   const handleSubmit = async () => {
@@ -130,6 +145,9 @@ const CreateSubjectsScreen = ({ navigation }) => {
           prerequisiteIds: Array.isArray(subject.prerequisiteIds)
             ? subject.prerequisiteIds.map((id) => parseInt(id, 10))
             : [], // Default to an empty array
+          startDate: subject.startDate, // Add startDate
+          endDate: subject.endDate,     // Add endDate
+          days: subject.days,           // Add days
         };
         console.log('Payload:', payload);
 
@@ -239,18 +257,41 @@ const CreateSubjectsScreen = ({ navigation }) => {
                   }))}
                 />
 
-<FormField
-  label="Prerequisites"
-  placeholder="Select Prerequisites"
-  type="select"
-  multiple // Allow multiple selections
-  value={subject.prerequisiteIds || []} // Ensure value is always an array
-  onChangeText={(value) => handleInputChange(index, 'prerequisiteIds', value)}
-  options={prerequisites.map((course) => ({
-    label: course.name, // Display course name
-    value: course.id.toString(), // Save course ID as a string
-  }))}
-/>
+                <FormField
+                  label="Prerequisites"
+                  placeholder="Select Prerequisites"
+                  type="select"
+                  multiple // Allow multiple selections
+                  value={subject.prerequisiteIds || []} // Ensure value is always an array
+                  onChangeText={(value) => handleInputChange(index, 'prerequisiteIds', value)}
+                  options={prerequisites.map((course) => ({
+                    label: course.name, // Display course name
+                    value: course.id.toString(), // Save course ID as a string
+                  }))}
+                />
+
+                <FormField
+                  label="Start Date"
+                  placeholder="Select Start Date"
+                  type="time" // Use a date picker component
+                  value={subject.startDate}
+                  onChangeText={(value) => handleInputChange(index, 'startDate', value)}
+                />
+
+                <FormField
+                  label="End Date"
+                  placeholder="Select End Date"
+                  type="time" // Use a date picker component
+                  value={subject.endDate}
+                  onChangeText={(value) => handleInputChange(index, 'endDate', value)}
+                />
+
+                <FormField
+                  label="Days"
+                  placeholder="Enter Days (e.g., Monday, Wednesday)"
+                  value={subject.days}
+                  onChangeText={(value) => handleInputChange(index, 'days', value)}
+                />
               </View>
             ))}
           </SectionContainer>
