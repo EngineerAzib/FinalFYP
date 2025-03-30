@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { View, ScrollView, Text, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Header } from '../Components/Header';
@@ -9,17 +9,17 @@ import { SectionContainer } from '../Components/SectionContainer';
 import { CustomButton } from '../Components/CustomButton';
 
 export const EditSemesterRegistration = ({ route, navigation }) => {
-  const { deptCode, semesterNumber, semesterData } = route.params;
+  const { deptCode, deptName, semesterNumber, semesterName, semesterDetails } = route.params;
 
-  // Initialize state with existing semester data
+  // Initialize state with existing semester data from the first item in the array
   const [registrationData, setRegistrationData] = useState({
-    semester: semesterData.semester,
-    registrationDeadline: new Date(semesterData.registrationDeadline),
-    startDate: new Date(semesterData.startDate),
-    courses: semesterData.courses.map(course => ({
+    semester: semesterName, // Use semesterName from params instead of semesterDetails
+    registrationDeadline: new Date(semesterDetails[0].registrationDeadline),
+    startDate: new Date(semesterDetails[0].startDate),
+    courses: semesterDetails[0].courses.map(course => ({
       ...course,
-      isEditing: false
-    }))
+      isEditing: false,
+    })),
   });
 
   // State for date picker visibility
@@ -32,8 +32,8 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
       return;
     }
 
-    const hasInvalidCourses = registrationData.courses.some(course =>
-      !course.code || !course.name || !course.creditHours || !course.instructor
+    const hasInvalidCourses = registrationData.courses.some(
+      course => !course.code || !course.name || !course.creditHours || !course.instructor
     );
 
     if (hasInvalidCourses) {
@@ -70,11 +70,11 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
       instructor: '',
       maxStudents: 40,
       prerequisites: [],
-      isEditing: true
+      isEditing: true,
     };
     setRegistrationData({
       ...registrationData,
-      courses: [...registrationData.courses, newCourse]
+      courses: [...registrationData.courses, newCourse],
     });
   };
 
@@ -90,8 +90,8 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
           onPress: () => {
             const newCourses = registrationData.courses.filter((_, i) => i !== index);
             setRegistrationData({ ...registrationData, courses: newCourses });
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -114,7 +114,7 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
         <View style={styles.EditSemesterRegistrationcourseHeaderRight}>
           <TouchableOpacity onPress={() => toggleCourseEdit(index)}>
             <MaterialIcons
-              name={course.isEditing ? "check" : "edit"}
+              name={course.isEditing ? 'check' : 'edit'}
               size={24}
               color="#6C63FF"
             />
@@ -158,7 +158,7 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
           {course.type.includes('Lab') && (
             <TextInput
               style={styles.EditSemesterRegistrationinput}
-              value={course.labInstructor}
+              value={course.labInstructor || ''}
               onChangeText={(text) => updateCourse(index, 'labInstructor', text)}
               placeholder="Lab Instructor"
             />
@@ -211,11 +211,11 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
         <View style={styles.EditSemesterRegistrationheaderInfo}>
           <View style={styles.EditSemesterRegistrationinfoItem}>
             <MaterialIcons name="domain" size={24} color="#6C63FF" />
-            <Text style={styles.EditSemesterRegistrationinfoText}>{semesterData?.name || deptCode}</Text>
+            <Text style={styles.EditSemesterRegistrationinfoText}>{deptName || deptCode}</Text>
           </View>
           <View style={styles.EditSemesterRegistrationinfoItem}>
             <MaterialIcons name="school" size={24} color="#6C63FF" />
-            <Text style={styles.EditSemesterRegistrationinfoText}>{semesterData?.semester}</Text>
+            <Text style={styles.EditSemesterRegistrationinfoText}>{semesterName}</Text>
           </View>
         </View>
 
@@ -261,8 +261,8 @@ export const EditSemesterRegistration = ({ route, navigation }) => {
       <View style={styles.CreateExamSchedulebuttonContainer}>
         <CustomButton
           buttons={[
-            { title: "Cancel", onPress: () => navigation.goBack(), variant: "secondary" },
-            { title: "Edit Registeration", onPress: handleSaveChanges, variant: "primary" }
+            { title: 'Cancel', onPress: () => navigation.goBack(), variant: 'secondary' },
+            { title: 'Edit Registration', onPress: handleSaveChanges, variant: 'primary' },
           ]}
         />
       </View>

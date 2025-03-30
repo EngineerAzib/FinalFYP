@@ -1,7 +1,6 @@
 // Components/MetricsList.js
 import React from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Text,  Animated, TouchableOpacity } from 'react-native';
 import styles from '../AdminPortal_Css';
 
 const MetricsList = ({ metrics = [], onMetricPress }) => {

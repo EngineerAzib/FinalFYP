@@ -4,9 +4,7 @@ import { Text } from 'react-native';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { StyleSheet } from 'react-native';
 import { Header } from '../Components/Header';
-// import  {SemesterCoursesScreen}  from '../Screens/SemesterCoursesScreen'; 
 import { CustomHeader } from '../Components/CustomHeader';
-// import { EditCourseScreen } from './EditCourseScreen';
 import styles from '../AdminPortal_Css';
 
 export const DepartmentSemestersScreen = ({ route, navigation }) => {

@@ -513,7 +513,256 @@ const AdminPortal_Css = StyleSheet.create({
 
 
   //create department 
+  CreateDepartmentScreenhiddenContent: {
+    display: 'none',
+  },
+  
+  // Slot item container
+  // Add these styles to your AdminPortal_Css.js file
 
+// Day selection styles
+daySelectionContainer: {
+  marginBottom: 20,
+},
+daySelectionLabel: {
+  fontSize: 16,
+  fontWeight: '600',
+  marginBottom: 10,
+},
+dayButtonsContainer: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: 10,
+},
+dayButton: {
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  borderRadius: 5,
+  borderWidth: 1,
+  borderColor: '#E0E0E0',
+  backgroundColor: '#F5F5F5',
+},
+selectedDayButton: {
+  backgroundColor: '#2196F3',
+  borderColor: '#1976D2',
+},
+dayButtonText: {
+  fontSize: 14,
+  color: '#333333',
+},
+selectedDayButtonText: {
+  color: '#FFFFFF',
+  fontWeight: '500',
+},
+
+// Session list styles
+dayScheduleContainer: {
+  marginBottom: 25,
+},
+dayTitle: {
+  fontSize: 16,
+  fontWeight: '600',
+  marginBottom: 10,
+  color: '#333333',
+},
+noSessionsText: {
+  fontStyle: 'italic',
+  color: '#757575',
+  marginBottom: 15,
+},
+sessionItem: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingVertical: 12,
+  paddingHorizontal: 15,
+  backgroundColor: '#F9F9F9',
+  borderRadius: 8,
+  borderLeftWidth: 4,
+  borderLeftColor: '#2196F3',
+  marginBottom: 10,
+},
+sessionDetails: {
+  flex: 1,
+},
+sessionTime: {
+  fontSize: 15,
+  fontWeight: '600',
+  color: '#333333',
+  marginBottom: 4,
+},
+sessionInfo: {
+  fontSize: 14,
+  color: '#555555',
+},
+removeButton: {
+  backgroundColor: '#F44336',
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  borderRadius: 4,
+},
+removeButtonText: {
+  color: '#FFFFFF',
+  fontSize: 12,
+  fontWeight: '500',
+},
+
+// Add session button container
+addSessionButtonContainer: {
+  marginTop: 15,
+  marginBottom: 10,
+},
+  CreateDepartmentScreenslotItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#e1e5eb',
+  },
+  
+  // Slot content (left side)
+  CreateDepartmentScreenslotContent: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  
+  // Time text styling
+  CreateDepartmentScreenslotTime: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#344054',
+    marginBottom: 4,
+  },
+  
+  // Department and section details
+  CreateDepartmentScreenslotDetail: {
+    fontSize: 14,
+    color: '#667085',
+  },
+  
+  // Remove button
+  CreateDepartmentScreenremoveButton: {
+    backgroundColor: '#fee4e2',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  
+  // Remove button text
+  CreateDepartmentScreenremoveButtonText: {
+    color: '#d92d20',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  
+  // No slots text
+  CreateDepartmentScreennoSlotsText: {
+    textAlign: 'center',
+    color: '#667085',
+    fontStyle: 'italic',
+    padding: 16,
+  },
+  CreateDepartmentScreendaySelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+    flexWrap: 'wrap',
+  },
+  CreateDepartmentScreendayButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    backgroundColor: '#F5F5F5',
+    minWidth: 100,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  CreateDepartmentScreenactiveDayButton: {
+    backgroundColor: '#2070CC',
+    borderColor: '#2070CC',
+  },
+  CreateDepartmentScreenaddSlotButton: {
+    marginTop: 16,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  CreateDepartmentScreendayButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#555555',
+  },
+  CreateDepartmentScreenactiveDayButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+CreateDepartmentScreenratingInstructions: {
+  fontSize: 14,
+  color: '#666',
+  marginBottom: 15,
+  fontStyle: 'italic',
+},
+
+CreateDepartmentScreenratingContainer: {
+  marginBottom: 20,
+},
+
+CreateDepartmentScreenratingScale: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginTop: 8,
+  paddingHorizontal: 12,
+  marginBottom: 5,
+},
+
+CreateDepartmentScreenratingNumber: {
+  width: 30,
+  height: 30,
+  borderRadius: 15,
+  borderWidth: 1,
+  borderColor: '#ddd',
+  textAlign: 'center',
+  textAlignVertical: 'center',
+  fontSize: 14,
+  paddingTop: 6,
+  color: '#666',
+},
+
+CreateDepartmentScreenselectedRating: {
+  backgroundColor: '#4a86e8',
+  color: 'white',
+  borderColor: '#4a86e8',
+},
+
+CreateDepartmentScreenoverallRating: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginTop: 15,
+  marginBottom: 20,
+  padding: 15,
+  backgroundColor: '#f8f8f8',
+  borderRadius: 8,
+  borderLeftWidth: 4,
+  borderLeftColor: '#4a86e8',
+},
+
+CreateDepartmentScreenoverallRatingLabel: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#333',
+  marginRight: 10,
+},
+
+CreateDepartmentScreenoverallRatingValue: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  color: '#4a86e8',
+},
   CreateDepartmentScreenmainContainer: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -3027,7 +3276,7 @@ const AdminPortal_Css = StyleSheet.create({
   },
   EditTeacherScheduleformContainer: {
     gap: 16,
-    
+
   },
   EditTeacherSchedulefullWidthInput: {
     width: '100%',
@@ -3668,6 +3917,29 @@ const AdminPortal_Css = StyleSheet.create({
   },
 
   // student profile view
+  placeholderContainer: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#6C63FF',
+    borderRadius: 8,
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F9FAFB',
+    minHeight: 120,
+  },
+  placeholderText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#6C63FF',
+    marginTop: 8,
+  },
+  placeholderSubText: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 4,
+  },
   StudentProfileViewcontainer: {
     flex: 1,
     backgroundColor: '#F5F6FA',
@@ -5189,14 +5461,14 @@ const AdminPortal_Css = StyleSheet.create({
   FormFieldformFieldContainer: {
     marginVertical: 20,
     width: '100%',
-    
+
   },
   FormFieldlabelContainer: {
     position: 'absolute',
     top: -10,
     left: 16,
     zIndex: 1,
-    
+
   },
   FormFieldlabelText: {
     fontSize: 14,
@@ -5865,8 +6137,8 @@ const AdminPortal_Css = StyleSheet.create({
     borderRadius: 24,
     padding: 20,
     marginBottom: 24,
-    width: WINDOW_WIDTH - 10, 
-    alignSelf: 'center', 
+    width: WINDOW_WIDTH - 10,
+    alignSelf: 'center',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -6244,7 +6516,245 @@ const AdminPortal_Css = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
   },
+  //student Internship Screens
 
+  StudentInternshipScreencontainer: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  StudentInternshipScreencontent: {
+    padding: 16,
+  },
+  StudentInternshipScreensuccessContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  StudentInternshipScreensuccessCard: {
+    backgroundColor: 'white',
+    borderRadius: 24,
+    padding: 24,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  StudentInternshipScreensuccessIconContainer: {
+    marginBottom: 24,
+  },
+  StudentInternshipScreensuccessTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  StudentInternshipScreensuccessSubtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  StudentInternshipScreenviewApplicationsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    padding: 16,
+  },
+  StudentInternshipScreenviewApplicationsText: {
+    color: '#6C63FF',
+    fontSize: 16,
+    fontWeight: '500',
+    marginRight: 8,
+  },
+
+
+  // Search container styles
+  StudentInternshipScreensearchContainer: {
+    marginBottom: 16,
+  },
+  StudentInternshipScreensearchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  StudentInternshipScreensearchInput: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: '#1F2937',
+    flex: 1,
+  },
+
+  // Internship card styles
+  StudentInternshipScreeninternshipCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  StudentInternshipScreencardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  StudentInternshipScreentitleContainer: {
+    flex: 1,
+    marginRight: 12,
+  },
+  StudentInternshipScreeninternshipTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  StudentInternshipScreencompanyName: {
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  StudentInternshipScreenstatusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  StudentInternshipScreenstatusText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+
+
+  StudentInternshipScreenformCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    margin: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  StudentInternshipScreenformTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 24,
+  },
+  StudentInternshipScreeninputContainer: {
+    marginBottom: 20,
+  },
+  StudentInternshipScreeninputLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4B5563',
+    marginBottom: 8,
+  },
+  StudentInternshipScreentextInput: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: '#1F2937',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  StudentInternshipScreentextArea: {
+    height: 120,
+    textAlignVertical: 'top',
+  },
+
+  // Submit button styles
+  StudentInternshipScreensubmitContainer: {
+    marginTop: 24,
+  },
+  StudentInternshipScreensubmitButton: {
+    backgroundColor: '#6C63FF',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  StudentInternshipScreensubmitButtonDisabled: {
+    backgroundColor: '#A5A6F6',
+  },
+  StudentInternshipScreensubmitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  StudentInternshipScreenprogressBar: {
+    height: 4,
+    backgroundColor: '#6C63FF',
+    borderRadius: 2,
+    marginBottom: 16,
+  }, StudentInternshipScreendetailCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 20,
+    margin: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  StudentInternshipScreendetailTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 16,
+  },
+  StudentInternshipScreeninfoSection: {
+    marginTop: 16,
+  },
+  StudentInternshipScreeninfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  StudentInternshipScreeninfoText: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: '#4B5563',
+  },
+
+
+
+  StudentInternshipScreenformContainer: {
+    padding: 16,
+  },
+  StudentInternshipScreendocumentUpload: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+  },
+  StudentInternshipScreendocumentUploadText: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: '#9CA3AF',
+  },
 });
 
 

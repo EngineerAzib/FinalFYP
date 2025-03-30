@@ -6,22 +6,58 @@ import { CustomHeader } from '../Components/CustomHeader';
 import styles from '../AdminPortal_Css';
 
 export const SemesterDetailsScreen = ({ navigation, route }) => {
-  const { deptCode, deptName, semesterNumber, semesterData } = route.params || {};
+  const { deptCode, deptName, semesterNumber, semesterName } = route.params;
+
+  const semesterDetails = [
+    {
+      registrationDeadline: "2025-02-15",
+      startDate: "2025-02-01",
+      courses: [
+        {
+          code: `${deptCode}501`,
+          name: "Software Design Patterns",
+          creditHours: 3,
+          type: "Theory",
+          instructor: "Dr. John Smith",
+          maxStudents: 50,
+          prerequisites: [`${deptCode}401`, `${deptCode}402`],
+        },
+        {
+          code: `${deptCode}502`,
+          name: "Database Systems",
+          creditHours: 3,
+          type: "Theory",
+          instructor: "Dr. Alice Johnson",
+          maxStudents: 50,
+          prerequisites: [`${deptCode}401`],
+        },
+      ],
+    },
+  ];
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
 
   const handleEditRegistration = () => {
     navigation.navigate('EditSemesterRegistration', {
       deptCode,
+      deptName,
       semesterNumber,
-      semesterData
+      semesterName,
+      semesterDetails,
     });
   };
-
 
   return (
     <View style={styles.SemesterRegistrationViewcontainer}>
       <Header />
       <CustomHeader
-        title="Semester Registeration"
+        title="Semester Registration"
         currentScreen="Reg_ Details"
         showSearch={false}
         showRefresh={false}
@@ -35,7 +71,7 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
           </View>
           <View style={styles.EditSemesterRegistrationinfoItem}>
             <MaterialIcons name="school" size={24} color="#6C63FF" />
-            <Text style={styles.EditSemesterRegistrationinfoText}>{semesterData.semester}</Text>
+            <Text style={styles.EditSemesterRegistrationinfoText}>{semesterName}</Text>
           </View>
         </View>
         <View style={styles.SemesterRegistrationViewcard}>
@@ -44,7 +80,7 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
               <MaterialIcons name="event-note" size={24} color="#6C63FF" />
               <View style={styles.SemesterRegistrationViewsemesterInfoContainer}>
                 <Text style={styles.SemesterRegistrationViewcardTitle}>
-                  {semesterData.semester}
+                  {semesterName}
                 </Text>
               </View>
             </View>
@@ -57,19 +93,23 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
           </View>
 
           <View style={styles.SemesterRegistrationViewcardContent}>
-            {semesterData.courses.map((course, index) => (
+            {semesterDetails[0].courses.map((course, index) => (
               <View key={index} style={styles.SemesterRegistrationViewcourseContainer}>
                 <View style={styles.SemesterRegistrationViewcourseHeader}>
                   <View style={styles.SemesterRegistrationViewcourseCodeContainer}>
                     <Text style={styles.SemesterRegistrationViewcourseCode}>{course.code}</Text>
-                    <View style={[
-                      styles.SemesterRegistrationViewcourseTypeTag,
-                      { backgroundColor: course?.type?.includes('Lab') ? '#EEF0FB' : '#F0FDF4' }
-                    ]}>
-                      <Text style={[
-                        styles.SemesterRegistrationViewcourseTypeText,
-                        { color: course?.type?.includes('Lab') ? '#6C63FF' : '#10B981' }
-                      ]}>
+                    <View
+                      style={[
+                        styles.SemesterRegistrationViewcourseTypeTag,
+                        { backgroundColor: course?.type?.includes('Lab') ? '#EEF0FB' : '#F0FDF4' },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.SemesterRegistrationViewcourseTypeText,
+                          { color: course?.type?.includes('Lab') ? '#6C63FF' : '#10B981' },
+                        ]}
+                      >
                         {course.type}
                       </Text>
                     </View>

@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
-import styles from '../AdminPortal_Css';
 import { SectionContainer } from '../Components/SectionContainer';
 import { FormField } from '../Components/FormField';
 import { CustomButton } from '../Components/CustomButton';
+import styles from '../AdminPortal_Css';
 
 const CreateSemesterRegistration = ({ navigation }) => {
   const [formData, setFormData] = useState({
-    department: '',
-    departmentName: '',
+    deptCode: '',
+    deptName: '',
     semesterNumber: '',
     registrationDeadline: '',
     startDate: '',
@@ -24,8 +24,8 @@ const CreateSemesterRegistration = ({ navigation }) => {
       labInstructor: '',
       maxStudents: '',
       prerequisites: [],
-      showPrereqInput: false
-    }]
+      showPrereqInput: false,
+    }],
   });
 
   const [currentPrereq, setCurrentPrereq] = useState('');
@@ -42,15 +42,15 @@ const CreateSemesterRegistration = ({ navigation }) => {
         labInstructor: '',
         maxStudents: '',
         prerequisites: [],
-        showPrereqInput: false
-      }]
+        showPrereqInput: false,
+      }],
     }));
   };
 
   const removeCourse = (index) => {
     setFormData(prev => ({
       ...prev,
-      courses: prev.courses.filter((_, i) => i !== index)
+      courses: prev.courses.filter((_, i) => i !== index),
     }));
   };
 
@@ -59,7 +59,7 @@ const CreateSemesterRegistration = ({ navigation }) => {
       const newCourses = [...prev.courses];
       newCourses[courseIndex] = {
         ...newCourses[courseIndex],
-        showPrereqInput: !newCourses[courseIndex].showPrereqInput
+        showPrereqInput: !newCourses[courseIndex].showPrereqInput,
       };
       return { ...prev, courses: newCourses };
     });
@@ -71,9 +71,9 @@ const CreateSemesterRegistration = ({ navigation }) => {
         const newCourses = [...prev.courses];
         newCourses[courseIndex].prerequisites = [
           ...newCourses[courseIndex].prerequisites,
-          currentPrereq.trim()
+          currentPrereq.trim(),
         ];
-        newCourses[courseIndex].showPrereqInput = false; // Hide input after adding
+        newCourses[courseIndex].showPrereqInput = false;
         return { ...prev, courses: newCourses };
       });
       setCurrentPrereq('');
@@ -97,12 +97,62 @@ const CreateSemesterRegistration = ({ navigation }) => {
     });
   };
 
+  const handleCreateRegistration = () => {
+    // Validation
+    if (!formData.deptCode || !formData.deptName || !formData.semesterNumber || 
+        !formData.registrationDeadline || !formData.startDate) {
+      Alert.alert('Validation Error', 'Please fill in all required fields');
+      return;
+    }
+
+    const hasInvalidCourses = formData.courses.some(course => 
+      !course.code || !course.name || !course.creditHours || !course.instructor || !course.maxStudents
+    );
+
+    if (hasInvalidCourses) {
+      Alert.alert('Validation Error', 'Please fill in all required course details');
+      return;
+    }
+
+    // Prepare data to match SemesterDetailsScreen structure
+    const semesterDetails = [{
+      registrationDeadline: formData.registrationDeadline,
+      startDate: formData.startDate,
+      courses: formData.courses.map(course => ({
+        code: course.code,
+        name: course.name,
+        creditHours: parseInt(course.creditHours) || 0,
+        type: course.type,
+        instructor: course.instructor,
+        labInstructor: course.type === 'Theory + Lab' ? course.labInstructor : undefined,
+        maxStudents: parseInt(course.maxStudents) || 0,
+        prerequisites: course.prerequisites,
+      })),
+    }];
+
+    // Simulate API call and navigate back with data
+    Alert.alert(
+      'Success',
+      'Semester registration created successfully',
+      [{
+        text: 'OK',
+        onPress: () => navigation.navigate('SemesterDetailsScreen', {
+          deptCode: formData.deptCode,
+          deptName: formData.deptName,
+          semesterNumber: formData.semesterNumber,
+          semesterName: `${formData.semesterNumber}th Semester`, // Assuming ordinal naming
+          semesterDetails,
+        }),
+      }],
+    );
+  };
+
   return (
     <View style={styles.CreateSemesterRegistrationmainContainer}>
       <Header />
       <CustomHeader
         title="Semester Registration"
-        currentScreen="Add Registeration"
+        currentScreen="Add Registration"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
@@ -132,14 +182,14 @@ const CreateSemesterRegistration = ({ navigation }) => {
           >
             <FormField
               label="Department Code"
-              value={formData.department}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, department: text }))}
+              value={formData.deptCode}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, deptCode: text }))}
               placeholder="e.g., SE, CS"
             />
             <FormField
               label="Department Name"
-              value={formData.departmentName}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, departmentName: text }))}
+              value={formData.deptName}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, deptName: text }))}
               placeholder="e.g., Software Engineering"
             />
             <FormField
@@ -209,13 +259,13 @@ const CreateSemesterRegistration = ({ navigation }) => {
                         key={type}
                         style={[
                           styles.CreateSemesterRegistrationtypeButton,
-                          course.type === type && styles.CreateSemesterRegistrationtypeButtonActive
+                          course.type === type && styles.CreateSemesterRegistrationtypeButtonActive,
                         ]}
                         onPress={() => updateCourseField(index, 'type', type)}
                       >
                         <Text style={[
                           styles.CreateSemesterRegistrationtypeButtonText,
-                          course.type === type && styles.CreateSemesterRegistrationtypeButtonTextActive
+                          course.type === type && styles.CreateSemesterRegistrationtypeButtonTextActive,
                         ]}>
                           {type}
                         </Text>
@@ -264,7 +314,6 @@ const CreateSemesterRegistration = ({ navigation }) => {
                     ))}
                   </View>
 
-                  {/* Prerequisite Add Button */}
                   <TouchableOpacity
                     style={styles.CreateSemesterRegistrationaddPrereqButton}
                     onPress={() => togglePrerequisiteInput(index)}
@@ -273,7 +322,6 @@ const CreateSemesterRegistration = ({ navigation }) => {
                     <Text style={styles.CreateSemesterRegistrationaddPrereqButtonText}>Add Prerequisite</Text>
                   </TouchableOpacity>
 
-                  {/* Conditional Prerequisite Input */}
                   {course.showPrereqInput && (
                     <View style={styles.CreateSemesterRegistrationaddPrereqContainer}>
                       <FormField
@@ -308,15 +356,15 @@ const CreateSemesterRegistration = ({ navigation }) => {
           <CustomButton
             buttons={[
               {
-                title: "Cancel",
+                title: 'Cancel',
                 onPress: () => navigation.goBack(),
-                variant: "secondary",
+                variant: 'secondary',
               },
               {
-                title: "Create Registeration",
-                onPress: updateCourseField,
-                variant: "primary",
-              }
+                title: 'Create Registration',
+                onPress: handleCreateRegistration,
+                variant: 'primary',
+              },
             ]}
           />
         </View>
