@@ -13,12 +13,11 @@ const CircularProgress = ({ value, size, strokeWidth, duration, label, scale, co
 
   useEffect(() => {
     const maxValue = scale || 4.0;
-    const percentage = (value / maxValue) * 100;
+    const clampedValue = Math.min(value, maxValue); 
+    const percentage = (clampedValue / maxValue) * 100;
 
-    // Reset animation when component mounts
     animatedValue.setValue(0);
 
-    // Start animation after 500ms delay
     setTimeout(() => {
       Animated.timing(animatedValue, {
         toValue: percentage,

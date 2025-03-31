@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, Alert } from 'react-native';
+import { View, ScrollView, Text, Alert } from 'react-native';
 import { CustomHeader } from '../Components/CustomHeader';
 import { FormField } from '../Components/FormField';
 import { Header } from '../Components/Header';
