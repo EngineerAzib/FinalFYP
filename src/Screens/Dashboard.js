@@ -15,122 +15,200 @@ import { LineChart, PieChart } from 'react-native-chart-kit';
 import { StatusBar } from 'expo-status-bar';
 import LottieView from 'lottie-react-native';
 import { Header } from '../Components/Header';
+import Dashboard from '../Services/Dashboard/Dashboard';
 
 const { width, height } = Dimensions.get('window');
 
 const AdminDashboard = ({ navigation }) => {
-  // Animation values
-  const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  const slideAnim = React.useRef(new Animated.Value(30)).current;
+  const [dashboardData, setDashboardData] = useState(null);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(30));
   const [refreshing, setRefreshing] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [selectedTab, setSelectedTab] = useState('overview');
-  const [currentPeriod, setCurrentPeriod] = useState('weekly');
   const [isLoading, setIsLoading] = useState(true);
-
+  const [error, setError] = useState(null);
+  const [currentPeriod, setCurrentPeriod] = useState('weekly');
+ 
   // Sample data (replace with real data from your API)
-  const [dashboardData, setDashboardData] = useState({
-    totalStudents: 4587,
-    totalTeachers: 234,
-    totalDepartments: 12,
-    totalCourses: 348,
-    pendingRequests: 18,
-    studentGenderDistribution: {
-      male: 2543,
-      female: 2044
-    },
-    departmentStrength: [
-      { name: 'Computer Science', students: 782, color: '#4F46E5' },
-      { name: 'Electrical Eng.', students: 654, color: '#10B981' },
-      { name: 'Mechanical Eng.', students: 587, color: '#F59E0B' },
-      { name: 'Civil Eng.', students: 492, color: '#EF4444' },
-      { name: 'Business Admin', students: 712, color: '#8B5CF6' }
-    ],
-    attendance: {
-      present: 87.2,
-      absent: 8.5,
-      leave: 4.3
-    },
-    examSchedules: [
-      { id: 'ES001', department: 'Computer Science', year: '2nd Year', date: '2025-04-15', status: 'Upcoming' },
-      { id: 'ES002', department: 'Electrical Engineering', year: '3rd Year', date: '2025-04-18', status: 'Upcoming' },
-      { id: 'ES003', department: 'Business Admin', year: '4th Year', date: '2025-04-20', status: 'Upcoming' }
-    ],
-    semesterRegistrations: [
-      { id: 'SR001', department: 'Computer Science', semester: 'Spring 2025', status: 'Open', courses: 24, students: 178 },
-      { id: 'SR002', department: 'Mechanical Engineering', semester: 'Spring 2025', status: 'Open', courses: 18, students: 142 }
-    ],
-    recentActivities: [
-      { id: 'ACT001', type: 'course', action: 'New Course Added', details: 'Advanced Machine Learning (CS-412)', time: '2 hours ago' },
-      { id: 'ACT002', type: 'student', action: 'Student Registration', details: 'John Smith registered to Computer Science', time: '3 hours ago' },
-      { id: 'ACT003', type: 'teacher', action: 'Teacher Allocation', details: 'Dr. Emily Johnson allocated to Database Systems', time: '5 hours ago' },
-      { id: 'ACT004', type: 'news', action: 'News Published', details: 'Annual Career Fair Announcement', time: '1 day ago' },
-      { id: 'ACT005', type: 'event', action: 'Event Created', details: 'Technical Workshop: Web 3.0 & Blockchain', time: '1 day ago' }
-    ],
-    notifications: [
-      { id: 'NOT001', title: 'Course Registration Deadline', message: 'Spring 2025 registration closes tomorrow', time: '20 minutes ago', read: false },
-      { id: 'NOT002', title: 'System Maintenance', message: 'System will be down for maintenance on Sunday, 2AM-4AM', time: '2 hours ago', read: false },
-      { id: 'NOT003', title: 'Report Generated', message: 'Student Performance Report is ready to download', time: '1 day ago', read: true },
-      { id: 'NOT004', title: 'New Policy Update', message: 'Student attendance policy has been updated', time: '2 days ago', read: true }
-    ],
-    performanceMetrics: {
-      weekly: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [
-          {
-            data: [65, 72, 84, 78, 90, 82, 76],
-            color: () => '#4F46E5',
-          }
-        ]
-      },
-      monthly: {
-        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-        datasets: [
-          {
-            data: [78, 82, 85, 89],
-            color: () => '#10B981',
-          }
-        ]
-      },
-      yearly: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        datasets: [
-          {
-            data: [65, 68, 72, 75, 78, 82, 85, 89, 92, 90, 88, 91],
-            color: () => '#8B5CF6',
-          }
-        ]
-      }
-    }
-  });
-
-  // Animation effect
+  // const [dashboardData, setDashboardData] = useState({
+  //   totalStudents: 4587,
+  //   totalTeachers: 234,
+  //   totalDepartments: 12,
+  //   totalCourses: 348,
+  //   pendingRequests: 18,
+  //   studentGenderDistribution: {
+  //     male: 2543,
+  //     female: 2044
+  //   },
+  //   departmentStrength: [
+  //     { name: 'Computer Science', students: 782, color: '#4F46E5' },
+  //     { name: 'Electrical Eng.', students: 654, color: '#10B981' },
+  //     { name: 'Mechanical Eng.', students: 587, color: '#F59E0B' },
+  //     { name: 'Civil Eng.', students: 492, color: '#EF4444' },
+  //     { name: 'Business Admin', students: 712, color: '#8B5CF6' }
+  //   ],
+  //   attendance: {
+  //     present: 87.2,
+  //     absent: 8.5,
+  //     leave: 4.3
+  //   },
+  //   examSchedules: [
+  //     { id: 'ES001', department: 'Computer Science', year: '2nd Year', date: '2025-04-15', status: 'Upcoming' },
+  //     { id: 'ES002', department: 'Electrical Engineering', year: '3rd Year', date: '2025-04-18', status: 'Upcoming' },
+  //     { id: 'ES003', department: 'Business Admin', year: '4th Year', date: '2025-04-20', status: 'Upcoming' }
+  //   ],
+  //   semesterRegistrations: [
+  //     { id: 'SR001', department: 'Computer Science', semester: 'Spring 2025', status: 'Open', courses: 24, students: 178 },
+  //     { id: 'SR002', department: 'Mechanical Engineering', semester: 'Spring 2025', status: 'Open', courses: 18, students: 142 }
+  //   ],
+  //   recentActivities: [
+  //     { id: 'ACT001', type: 'course', action: 'New Course Added', details: 'Advanced Machine Learning (CS-412)', time: '2 hours ago' },
+  //     { id: 'ACT002', type: 'student', action: 'Student Registration', details: 'John Smith registered to Computer Science', time: '3 hours ago' },
+  //     { id: 'ACT003', type: 'teacher', action: 'Teacher Allocation', details: 'Dr. Emily Johnson allocated to Database Systems', time: '5 hours ago' },
+  //     { id: 'ACT004', type: 'news', action: 'News Published', details: 'Annual Career Fair Announcement', time: '1 day ago' },
+  //     { id: 'ACT005', type: 'event', action: 'Event Created', details: 'Technical Workshop: Web 3.0 & Blockchain', time: '1 day ago' }
+  //   ],
+  //   notifications: [
+  //     { id: 'NOT001', title: 'Course Registration Deadline', message: 'Spring 2025 registration closes tomorrow', time: '20 minutes ago', read: false },
+  //     { id: 'NOT002', title: 'System Maintenance', message: 'System will be down for maintenance on Sunday, 2AM-4AM', time: '2 hours ago', read: false },
+  //     { id: 'NOT003', title: 'Report Generated', message: 'Student Performance Report is ready to download', time: '1 day ago', read: true },
+  //     { id: 'NOT004', title: 'New Policy Update', message: 'Student attendance policy has been updated', time: '2 days ago', read: true }
+  //   ],
+  //   performanceMetrics: {
+  //     weekly: {
+  //       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  //       datasets: [
+  //         {
+  //           data: [65, 72, 84, 78, 90, 82, 76],
+  //           color: () => '#4F46E5',
+  //         }
+  //       ]
+  //     },
+  //     monthly: {
+  //       labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+  //       datasets: [
+  //         {
+  //           data: [78, 82, 85, 89],
+  //           color: () => '#10B981',
+  //         }
+  //       ]
+  //     },
+  //     yearly: {
+  //       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  //       datasets: [
+  //         {
+  //           data: [65, 68, 72, 75, 78, 82, 85, 89, 92, 90, 88, 91],
+  //           color: () => '#8B5CF6',
+  //         }
+  //       ]
+  //     }
+  //   }
+  // });
+ 
   useEffect(() => {
-    // Simulate loading data
-    setTimeout(() => {
-      setIsLoading(false);
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 800,
-          useNativeDriver: true,
-        })
-      ]).start();
-    }, 1500);
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await Dashboard();
+        
+        if (!data) {
+          throw new Error("No data received from the server");
+        }
+
+        // Transform performanceMetrics to ensure color is a function
+        const transformedData = {
+          ...data,
+          performanceMetrics: {
+            weekly: {
+              ...data.performanceMetrics?.weekly,
+              datasets: data.performanceMetrics?.weekly?.datasets?.map(dataset => ({
+                ...dataset,
+                color: () => dataset.color || '#4F46E5',
+              })) || [],
+            },
+            monthly: {
+              ...data.performanceMetrics?.monthly,
+              datasets: data.performanceMetrics?.monthly?.datasets?.map(dataset => ({
+                ...dataset,
+                color: () => dataset.color || '#10B981',
+              })) || [],
+            },
+            yearly: {
+              ...data.performanceMetrics?.yearly,
+              datasets: data.performanceMetrics?.yearly?.datasets?.map(dataset => ({
+                ...dataset,
+                color: () => dataset.color || '#8B5CF6',
+              })) || [],
+            },
+          },
+        };
+        
+        setDashboardData(transformedData);
+        setError(null);
+        
+        // Start animations after data is loaded
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 800,
+            useNativeDriver: true,
+          })
+        ]).start();
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        setError(error.message || "Failed to load dashboard data");
+        setDashboardData(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    // Simulate refreshing data
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+    // Re-fetch data
+    fetchData().finally(() => setRefreshing(false));
   }, []);
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <LottieView
+          source={require('../Assets/Lottie Lego.json')}
+          autoPlay
+          loop
+          style={styles.loadingAnimation}
+        />
+        <Text style={styles.loadingText}>Loading Dashboard...</Text>
+      </View>
+    );
+  }
+
+  // Render error state
+  if (error || !dashboardData) {
+    return (
+      <View style={styles.errorContainer}>
+        <MaterialIcons name="error-outline" size={48} color="#EF4444" />
+        <Text style={styles.errorText}>{error || 'No data available'}</Text>
+        <TouchableOpacity 
+          style={styles.retryButton}
+          onPress={() => {
+            setIsLoading(true);
+            fetchData();
+          }}
+        >
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   // Helper function to render activity icon based on type
   const renderActivityIcon = (type) => {

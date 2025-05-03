@@ -1,41 +1,47 @@
-import React from 'react';
-import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
 import styles from '../AdminPortal_Css';
+import RegistrationDetail from '../Services/Registration/RegistrationDetail';
 
 export const SemesterDetailsScreen = ({ navigation, route }) => {
+  const [semesterDetails, setSemesterDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
   const { deptCode, deptName, semesterNumber, semesterName } = route.params;
+  
+  useEffect(() => {
+    const fetchSemesterDetails = async () => {
+      try {
+        setLoading(true);
+        const response = await RegistrationDetail(deptCode, semesterNumber);
+        
+        // Transform the API response to match our expected structure
+        const transformedData = Array.isArray(response) ? response[0] : response;
+        
+        // Ensure courses is always an array
+        const courses = transformedData.courses ? [transformedData.courses] : [];
+        
+        setSemesterDetails({
+          ...transformedData,
+          courses
+        });
+      } catch (err) {
+        console.error("Failed to fetch semester details:", err);
+        setError("Failed to load semester details. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const semesterDetails = [
-    {
-      registrationDeadline: "2025-02-15",
-      startDate: "2025-02-01",
-      courses: [
-        {
-          code: `${deptCode}501`,
-          name: "Software Design Patterns",
-          creditHours: 3,
-          type: "Theory",
-          instructor: "Dr. John Smith",
-          maxStudents: 50,
-          prerequisites: [`${deptCode}401`, `${deptCode}402`],
-        },
-        {
-          code: `${deptCode}502`,
-          name: "Database Systems",
-          creditHours: 3,
-          type: "Theory",
-          instructor: "Dr. Alice Johnson",
-          maxStudents: 50,
-          prerequisites: [`${deptCode}401`],
-        },
-      ],
-    },
-  ];
+    fetchSemesterDetails();
+  }, [deptCode, semesterNumber]);
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'Not specified';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -44,6 +50,8 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
   };
 
   const handleEditRegistration = () => {
+    if (!semesterDetails) return;
+    
     navigation.navigate('EditSemesterRegistration', {
       deptCode,
       deptName,
@@ -52,6 +60,76 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
       semesterDetails,
     });
   };
+
+  if (loading) {
+    return (
+      <View style={styles.SemesterRegistrationViewcontainer}>
+        <Header />
+        <CustomHeader
+          title="Semester Registration"
+          currentScreen="Reg_ Details"
+          showSearch={false}
+          showRefresh={false}
+          navigation={navigation}
+        />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6C63FF" />
+        </View>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.SemesterRegistrationViewcontainer}>
+        <Header />
+        <CustomHeader
+          title="Semester Registration"
+          currentScreen="Reg_ Details"
+          showSearch={false}
+          showRefresh={false}
+          navigation={navigation}
+        />
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity 
+            style={styles.retryButton}
+            onPress={() => {
+              setError(null);
+              setLoading(true);
+              fetchSemesterDetails();
+            }}
+          >
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  if (!semesterDetails || !semesterDetails.courses || semesterDetails.courses.length === 0) {
+    return (
+      <View style={styles.SemesterRegistrationViewcontainer}>
+        <Header />
+        <CustomHeader
+          title="Semester Registration"
+          currentScreen="Reg_ Details"
+          showSearch={false}
+          showRefresh={false}
+          navigation={navigation}
+        />
+        <View style={styles.noDataContainer}>
+          <Text style={styles.noDataText}>No course details available for this semester.</Text>
+          <TouchableOpacity
+            onPress={handleEditRegistration}
+            style={styles.addCoursesButton}
+          >
+            <Text style={styles.addCoursesButtonText}>Add Courses</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.SemesterRegistrationViewcontainer}>
@@ -73,6 +151,12 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
             <MaterialIcons name="school" size={24} color="#6C63FF" />
             <Text style={styles.EditSemesterRegistrationinfoText}>{semesterName}</Text>
           </View>
+          <View style={styles.EditSemesterRegistrationinfoItem}>
+            <MaterialIcons name="event" size={24} color="#6C63FF" />
+            <Text style={styles.EditSemesterRegistrationinfoText}>
+              Registration Deadline: {formatDate(semesterDetails.registrationDeadline)}
+            </Text>
+          </View>
         </View>
         <View style={styles.SemesterRegistrationViewcard}>
           <View style={styles.SemesterRegistrationViewcardHeader}>
@@ -81,6 +165,9 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
               <View style={styles.SemesterRegistrationViewsemesterInfoContainer}>
                 <Text style={styles.SemesterRegistrationViewcardTitle}>
                   {semesterName}
+                </Text>
+                <Text style={styles.SemesterRegistrationViewcardSubtitle}>
+                  Start Date: {formatDate(semesterDetails.startDate)}
                 </Text>
               </View>
             </View>
@@ -93,56 +180,52 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
           </View>
 
           <View style={styles.SemesterRegistrationViewcardContent}>
-            {semesterDetails[0].courses.map((course, index) => (
+            {semesterDetails.courses.map((course, index) => (
               <View key={index} style={styles.SemesterRegistrationViewcourseContainer}>
                 <View style={styles.SemesterRegistrationViewcourseHeader}>
                   <View style={styles.SemesterRegistrationViewcourseCodeContainer}>
-                    <Text style={styles.SemesterRegistrationViewcourseCode}>{course.code}</Text>
+                    <Text style={styles.SemesterRegistrationViewcourseCode}>
+                      {course?.code || 'N/A'}
+                    </Text>
                     <View
                       style={[
                         styles.SemesterRegistrationViewcourseTypeTag,
-                        { backgroundColor: course?.type?.includes('Lab') ? '#EEF0FB' : '#F0FDF4' },
+                        { backgroundColor: '#F0FDF4' },
                       ]}
                     >
                       <Text
                         style={[
                           styles.SemesterRegistrationViewcourseTypeText,
-                          { color: course?.type?.includes('Lab') ? '#6C63FF' : '#10B981' },
+                          { color: '#10B981' },
                         ]}
                       >
-                        {course.type}
+                        {course?.type || 'Theory'}
                       </Text>
                     </View>
                   </View>
                   <View style={styles.SemesterRegistrationViewcreditHoursContainer}>
                     <MaterialIcons name="access-time" size={16} color="#6B7280" />
                     <Text style={styles.SemesterRegistrationViewcreditHoursText}>
-                      {course.creditHours} Credit Hours
+                      {course?.creditHours || 0} Credit Hours
                     </Text>
                   </View>
                 </View>
-                <Text style={styles.SemesterRegistrationViewcourseName}>{course.name}</Text>
+                <Text style={styles.SemesterRegistrationViewcourseName}>
+                  {course?.name || 'Unnamed Course'}
+                </Text>
                 <View style={styles.SemesterRegistrationViewinstructorContainer}>
                   <MaterialIcons name="person" size={16} color="#6B7280" />
                   <Text style={styles.SemesterRegistrationViewinstructorText}>
-                    {course.instructor}
+                    {course?.instructor || 'Instructor not specified'}
                   </Text>
                 </View>
-                {course.labInstructor && (
-                  <View style={styles.SemesterRegistrationViewinstructorContainer}>
-                    <MaterialIcons name="person" size={16} color="#6B7280" />
-                    <Text style={styles.SemesterRegistrationViewinstructorText}>
-                      Lab Instructor: {course.labInstructor}
-                    </Text>
-                  </View>
-                )}
                 {course?.prerequisites?.length > 0 && (
                   <View style={styles.SemesterRegistrationViewprerequisitesContainer}>
                     <Text style={styles.SemesterRegistrationViewprerequisitesLabel}>
                       Prerequisites:
                     </Text>
                     <View style={styles.SemesterRegistrationViewprerequisitesList}>
-                      {course?.prerequisites?.map((prereq, pIndex) => (
+                      {course.prerequisites.map((prereq, pIndex) => (
                         <View key={pIndex} style={styles.SemesterRegistrationViewprerequisiteTag}>
                           <Text style={styles.SemesterRegistrationViewprerequisiteText}>
                             {prereq}
@@ -155,7 +238,7 @@ export const SemesterDetailsScreen = ({ navigation, route }) => {
                 <View style={styles.SemesterRegistrationViewmaxStudentsContainer}>
                   <MaterialIcons name="group" size={16} color="#6B7280" />
                   <Text style={styles.SemesterRegistrationViewmaxStudentsText}>
-                    Max Students: {course.maxStudents}
+                    Max Students: {course?.maxStudents || 0}
                   </Text>
                 </View>
               </View>

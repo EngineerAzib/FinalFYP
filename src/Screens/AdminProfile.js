@@ -5,8 +5,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import HeaderBackground from '../Components/HeaderBackground ';
 import styles from '../AdminPortal_Css';
-
+import axios from "axios";
+import { navigationRef } from './RootNavigation'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width } = Dimensions.get('window');
+import { API_BASE_URL } from '../Services/Config';
+import { useAuth } from '../../shared/AuthContext';
 
 // Enhanced AnimatedStatCard with light theme colors
 const AnimatedStatCard = ({ title, value, icon, color, index }) => {
@@ -48,7 +52,6 @@ const ProfileSection = ({ scrollY, navigation }) => {
     outputRange: [1, 0.3],
     extrapolate: 'clamp'
   });
-
 
 
   return (
@@ -121,6 +124,7 @@ const DetailSection = ({ title, icon, children, isExpanded, onToggle }) => {
 };
 
 const AdminProfile = ({ navigation }) => {
+  const { signOut } = useAuth();
   const scrollY = useRef(new Animated.Value(0)).current;
   const [expandedSection, setExpandedSection] = useState(null);
 
@@ -136,9 +140,29 @@ const AdminProfile = ({ navigation }) => {
     { label: 'Phone', value: '+1 800 555 1234' },
     { label: 'Date Joined', value: 'Jan 1, 2022' }
   ];
-  const handleLogout = () => {
-    // Add any logout logic here (clear tokens, reset state, navigate to login screen)
-    navigation.navigate('AuthScreen');
+  // const handleLogout=()=>{
+  //   navigation.navigate('AuthScreen');
+  // }
+  const handleLogout = async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if (token) {
+        await axios.post(`${API_BASE_URL}/api/Account/logout`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch (error) {
+      console.log('Logout API error:', error);
+    } finally {
+      try {
+        await AsyncStorage.multiRemove(['userToken', 'userRole']);
+        await signOut(); 
+
+      
+      } catch (err) {
+        console.error('Error clearing storage or navigating:', err);
+      }
+    }
   };
 
   return (

@@ -2,6 +2,12 @@
   "expo": {
     "name": "FypClone",
     "slug": "FypClone",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "extra": {
+      "eas": {
+        "projectId": "4377aaa6-e4a9-48d1-9d7a-1b23c0fc5e14"
+      }
+    },
+    "owner": "azibkhalid"
   }
 }

@@ -109,7 +109,18 @@ const AdminPortal_Css = StyleSheet.create({
 
 
   //AdminProfile screen
-
+pickerContainer: {
+  borderWidth: 1,
+  borderColor: '#CCCCCC',
+  borderRadius: 5,
+  marginVertical: 8,
+  overflow: 'hidden',
+},
+picker: {
+  width: '100%',
+  backgroundColor: '#FFFFFF',
+  height: Platform.OS === 'ios' ? 150 : 50, // Different heights for iOS/Android
+},
 
   AdminProfilecontainer: {
     flex: 1,
@@ -511,7 +522,71 @@ const AdminPortal_Css = StyleSheet.create({
     marginTop: 8,
   },
 
-
+   additionalStyles : {
+    container: {
+      flex: 1,
+      backgroundColor: '#f8f9fa',
+    },
+    scrollContainer: {
+      padding: 20,
+      paddingBottom: 100,
+    },
+    formTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 20,
+      color: '#333',
+    },
+    formGroup: {
+      marginBottom: 20,
+    },
+    label: {
+      fontSize: 16,
+      marginBottom: 8,
+      color: '#555',
+    },
+    pickerContainer: {
+      borderWidth: 1,
+      borderColor: '#ddd',
+      borderRadius: 8,
+      backgroundColor: 'white',
+      overflow: 'hidden',
+    },
+    buttonContainer: {
+      padding: 20,
+      backgroundColor: 'white',
+      borderTopWidth: 1,
+      borderTopColor: '#eee',
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    loadingText: {
+      marginTop: 10,
+      color: '#6B7280',
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+    errorText: {
+      color: 'red',
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    retryButton: {
+      backgroundColor: '#6C63FF',
+      padding: 10,
+      borderRadius: 5,
+    },
+    retryButtonText: {
+      color: 'white',
+    },
+  },
   //create department 
   CreateDepartmentScreenhiddenContent: {
     display: 'none',

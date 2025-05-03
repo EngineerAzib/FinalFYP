@@ -1,4 +1,3 @@
-// NotificationScreen.js
 import React, { useState, useEffect } from 'react';
 import {
     View,
@@ -12,62 +11,29 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Header } from '../Components/Header';
+import GetNotification from '../Services/Notification/getNotification';
 
 export const NotificationScreen = ({ navigation }) => {
-    // State for animation and filter
     const [fadeAnim] = useState(new Animated.Value(0));
     const [selectedFilter, setSelectedFilter] = useState('all');
+    const [notifications, setNotifications] = useState([]); // Initialize as empty array
+    const [loading, setLoading] = useState(true);
 
-    // Sample notification data
-    const notifications = [
-        {
-            id: 1,
-            type: 'academic',
-            title: 'Mid-Term Examination Schedule',
-            message: 'Mid-term examinations for Fall 2024 will commence from March 15th, 2025. Please check your portal for detailed schedule.',
-            timestamp: '2025-02-08T09:30:00',
-            isRead: false,
-            priority: 'high'
-        },
-        {
-            id: 2,
-            type: 'registration',
-            title: 'Course Registration Deadline',
-            message: 'The deadline for Spring 2025 course registration is approaching. Complete your registration by February 20th, 2025.',
-            timestamp: '2025-02-07T14:15:00',
-            isRead: true,
-            priority: 'high'
-        },
-        {
-            id: 3,
-            type: 'general',
-            title: 'Campus Event: Tech Talk Series',
-            message: 'Join us for an inspiring tech talk by industry experts on "Future of AI" on February 12th, 2025 at 2:00 PM in the Main Auditorium.',
-            timestamp: '2025-02-06T11:45:00',
-            isRead: false,
-            priority: 'medium'
-        },
-        {
-            id: 4,
-            type: 'academic',
-            title: 'Assignment Submission Reminder',
-            message: 'Reminder: The deadline for submitting Software Engineering project documentation is February 10th, 2025.',
-            timestamp: '2025-02-05T16:20:00',
-            isRead: true,
-            priority: 'medium'
-        },        {
-            id: 5,
-            type: 'academic',
-            title: 'Assignment Submission Reminder',
-            message: 'Reminder: The deadline for submitting Software Engineering project documentation is February 10th, 2025.',
-            timestamp: '2025-02-05T16:20:00',
-            isRead: true,
-            priority: 'medium'
-        },        
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await GetNotification(); // Call GetNotification as a function
+                setNotifications(data || []); // Ensure data is an array
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    ];
+        fetchData();
+    }, []);
 
-    // Filter options
     const filters = [
         { id: 'all', label: 'All', icon: 'notifications' },
         { id: 'academic', label: 'Academic', icon: 'school' },
@@ -75,7 +41,6 @@ export const NotificationScreen = ({ navigation }) => {
         { id: 'general', label: 'General', icon: 'campaign' }
     ];
 
-    // Animation effect on mount
     useEffect(() => {
         Animated.timing(fadeAnim, {
             toValue: 1,
@@ -84,7 +49,6 @@ export const NotificationScreen = ({ navigation }) => {
         }).start();
     }, []);
 
-    // Format timestamp to relative time
     const getRelativeTime = (timestamp) => {
         const now = new Date();
         const notificationDate = new Date(timestamp);
@@ -100,7 +64,6 @@ export const NotificationScreen = ({ navigation }) => {
         }
     };
 
-    // Get icon and color based on notification type
     const getNotificationStyle = (type, priority) => {
         const styles = {
             academic: {
@@ -132,7 +95,6 @@ export const NotificationScreen = ({ navigation }) => {
         };
     };
 
-    // Filter notifications
     const filteredNotifications = notifications.filter(notification =>
         selectedFilter === 'all' || notification.type === selectedFilter
     );
@@ -141,7 +103,13 @@ export const NotificationScreen = ({ navigation }) => {
         <View style={styles.notificationScreenContainer}>
             <Header />
 
-            {/* Filter Section */}
+            <TouchableOpacity
+                style={styles.floatingAddButton}
+                onPress={() => navigation.navigate('CreateNotificationScreen')}
+            >
+                <MaterialIcons name="add" size={24} color="white" />
+            </TouchableOpacity>
+
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -161,66 +129,72 @@ export const NotificationScreen = ({ navigation }) => {
                             size={20}
                             color={selectedFilter === filter.id ? '#FFFFFF' : '#6C63FF'}
                         />
-                        <Text style={[
-                            styles.notificationFilterText,
-                            selectedFilter === filter.id && styles.notificationFilterTextActive
-                        ]}>
+                        <Text
+                            style={[
+                                styles.notificationFilterText,
+                                selectedFilter === filter.id && styles.notificationFilterTextActive
+                            ]}
+                        >
                             {filter.label}
                         </Text>
                     </TouchableOpacity>
                 ))}
             </ScrollView>
 
-            {/* Notifications List */}
             <ScrollView style={styles.notificationListContainer}>
-                <Animated.View style={{ opacity: fadeAnim }}>
-                    {filteredNotifications.map((notification) => {
-                        const notificationStyle = getNotificationStyle(notification.type, notification.priority);
+                <Animated.View style={{ opacity: fadeAnim, paddingBottom: 100 }}>
+                    {loading ? (
+                        <Text style={styles.loadingText}>Loading notifications...</Text>
+                    ) : filteredNotifications.length > 0 ? (
+                        filteredNotifications.map((notification) => {
+                            const notificationStyle = getNotificationStyle(notification.type, notification.priority);
 
-                        return (
-                            <TouchableOpacity
-                                key={notification.id}
-                                style={[
-                                    styles.notificationCard,
-                                    !notification.isRead && styles.notificationCardUnread
-                                ]}
-                            >
-                                <View style={[
-                                    styles.notificationIconContainer,
-                                    { backgroundColor: notificationStyle.bgColor }
-                                ]}>
-                                    <MaterialIcons
-                                        name={notificationStyle.icon}
-                                        size={24}
-                                        color={notificationStyle.color}
-                                    />
-                                </View>
-
-                                <View style={styles.notificationContent}>
-                                    <View style={styles.notificationHeader}>
-                                        <Text style={styles.notificationTitle}>
-                                            {notification.title}
-                                        </Text>
-                                        <View style={styles.notificationMetaContainer}>
-                                            {!notification.isRead && (
-                                                <View style={[
-                                                    styles.notificationPriorityDot,
-                                                    { backgroundColor: notificationStyle.priorityColor }
-                                                ]} />
-                                            )}
-                                            <Text style={styles.notificationTime}>
-                                                {getRelativeTime(notification.timestamp)}
-                                            </Text>
-                                        </View>
+                            return (
+                                <TouchableOpacity
+                                    key={notification.id}
+                                    style={[
+                                        styles.notificationCard,
+                                        !notification.isRead && styles.notificationCardUnread
+                                    ]}
+                                >
+                                    <View
+                                        style={[
+                                            styles.notificationIconContainer,
+                                            { backgroundColor: notificationStyle.bgColor }
+                                        ]}
+                                    >
+                                        <MaterialIcons
+                                            name={notificationStyle.icon}
+                                            size={24}
+                                            color={notificationStyle.color}
+                                        />
                                     </View>
 
-                                    <Text style={styles.notificationMessage}>
-                                        {notification.message}
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        );
-                    })}
+                                    <View style={styles.notificationContent}>
+                                        <View style={styles.notificationHeader}>
+                                            <Text style={styles.notificationTitle}>{notification.title}</Text>
+                                            <View style={styles.notificationMetaContainer}>
+                                                {!notification.isRead && (
+                                                    <View
+                                                        style={[
+                                                            styles.notificationPriorityDot,
+                                                            { backgroundColor: notificationStyle.priorityColor }
+                                                        ]}
+                                                    />
+                                                )}
+                                                <Text style={styles.notificationTime}>
+                                                    {getRelativeTime(notification.timestamp)}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                        <Text style={styles.notificationMessage}>{notification.message}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })
+                    ) : (
+                        <Text style={styles.noNotificationsText}>No notifications available.</Text>
+                    )}
                 </Animated.View>
             </ScrollView>
         </View>

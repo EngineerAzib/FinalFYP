@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, StatusBar, Animated } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Image, StatusBar, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../shared/AuthContext';
 import StudentMenuDrawer from './StudentMenuDrawer';
-import styles from '../AdminPortal_Css';
-import { NotificationScreen } from '../Screens/NotificationScreen';
 import CustomMenuDrawer from './CustomMenuDrawer';
+import styles from '../AdminPortal_Css';
 
 export const Header = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const { userRole } = useAuth();
 
   // Animation values
   const bellRotation = new Animated.Value(0);
@@ -53,6 +54,18 @@ export const Header = () => {
     inputRange: [0, 1],
     outputRange: ['0deg', '30deg'],
   });
+
+  // Determine profile navigation based on role
+  const navigateToProfile = () => {
+    console.log(userRole,"userRole")
+    if (userRole === 'ADMIN' || userRole === 'admin') {
+      navigation.navigate('AdminProfile');
+    } else if (userRole === 'STUDENT' || userRole === 'student') {
+      navigation.navigate('AdminProfile'); // Create this screen if it doesn't exist
+    } else if (userRole === 'TEACHER') {
+      navigation.navigate('AdminProfile'); // Create this screen if it doesn't exist
+    }
+  };
 
   return (
     <>
@@ -96,13 +109,13 @@ export const Header = () => {
               </TouchableOpacity>
             </Animated.View>
 
-            {/* Admin Profile Picture */}
+            {/* Profile Picture */}
             <TouchableOpacity
               style={styles.HeaderprofileButton}
-              onPress={() => navigation.navigate('AdminProfile')}
+              onPress={navigateToProfile}
             >
               <Image
-                source={require('../Assets/profileicon.png')} 
+                source={require('../Assets/profileicon.png')}
                 style={styles.HeaderprofileImage}
               />
             </TouchableOpacity>
@@ -110,11 +123,20 @@ export const Header = () => {
         </View>
       </View>
 
-      <CustomMenuDrawer
-        isVisible={isMenuVisible}
-        onClose={() => setIsMenuVisible(false)}
-        navigation={navigation}
-      />
+      {/* Conditionally render the appropriate menu drawer based on user role */}
+      {userRole === 'STUDENT' ? (
+        <StudentMenuDrawer
+          isVisible={isMenuVisible}
+          onClose={() => setIsMenuVisible(false)}
+          navigation={navigation}
+        />
+      ) : (
+        <CustomMenuDrawer
+          isVisible={isMenuVisible}
+          onClose={() => setIsMenuVisible(false)}
+          navigation={navigation}
+        />
+      )}
     </>
   );
 };

@@ -1,370 +1,229 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, Alert } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Header } from '../Components/Header';
 import { CustomHeader } from '../Components/CustomHeader';
-import { SectionContainer } from '../Components/SectionContainer';
 import { FormField } from '../Components/FormField';
-import { CustomButton } from '../Components/CustomButton';
+import { SectionContainer } from '../Components/SectionContainer';
 import styles from '../AdminPortal_Css';
+import { CustomButton } from '../Components/CustomButton';
+import GetDepartmentList from '../Services/CoursesService/GetDepartmentList';
+import GetSemesterList from '../Services/CoursesService/SemesterList';
+import GetCourseList from '../Services/CoursesService/GetCourseList';
+import axios from 'axios';
+import { API_BASE_URL } from '../Services/Config';
 
-const CreateSemesterRegistration = ({ navigation }) => {
-  const [formData, setFormData] = useState({
-    deptCode: '',
-    deptName: '',
-    semesterNumber: '',
-    registrationDeadline: '',
-    startDate: '',
-    courses: [{
-      code: '',
-      name: '',
-      creditHours: '',
-      type: 'Theory',
-      instructor: '',
-      labInstructor: '',
-      maxStudents: '',
-      prerequisites: [],
-      showPrereqInput: false,
-    }],
-  });
+const SemesterRegistration = ({ navigation, route }) => {
+  const [subjects, setSubjects] = useState([{
+    departmentId: '',
+    semesterId: '',
+    courseId: '',
+    studentRegistred: null,
+    maxStudent: null,
+    startDate: null,
+    endDate: null
+  }]);
 
-  const [currentPrereq, setCurrentPrereq] = useState('');
+  const [departments, setDepartments] = useState([]);
+  const [semesters, setSemesters] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const addCourse = () => {
-    setFormData(prev => ({
-      ...prev,
-      courses: [...prev.courses, {
-        code: '',
-        name: '',
-        creditHours: '',
-        type: 'Theory',
-        instructor: '',
-        labInstructor: '',
-        maxStudents: '',
-        prerequisites: [],
-        showPrereqInput: false,
-      }],
-    }));
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [depts, sems, crses] = await Promise.all([
+          GetDepartmentList(),
+          GetSemesterList(),
+          GetCourseList()
+        ]);
+        setDepartments(depts);
+        setSemesters(sems);
+        setCourses(crses);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        Alert.alert('Error', 'Failed to load registration data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleInputChange = (index, field, value) => {
+    const updatedSubjects = [...subjects];
+    updatedSubjects[index][field] = value;
+    setSubjects(updatedSubjects);
   };
 
-  const removeCourse = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      courses: prev.courses.filter((_, i) => i !== index),
-    }));
+  const addMoreSubjects = () => {
+    setSubjects([...subjects, {
+      departmentId: '',
+      semesterId: '',
+      courseId: '',
+      studentRegistred: null,
+      maxStudent: null,
+      startDate: null,
+      endDate: null
+    }]);
   };
 
-  const togglePrerequisiteInput = (courseIndex) => {
-    setFormData(prev => {
-      const newCourses = [...prev.courses];
-      newCourses[courseIndex] = {
-        ...newCourses[courseIndex],
-        showPrereqInput: !newCourses[courseIndex].showPrereqInput,
-      };
-      return { ...prev, courses: newCourses };
-    });
-  };
-
-  const addPrerequisite = (courseIndex) => {
-    if (currentPrereq.trim()) {
-      setFormData(prev => {
-        const newCourses = [...prev.courses];
-        newCourses[courseIndex].prerequisites = [
-          ...newCourses[courseIndex].prerequisites,
-          currentPrereq.trim(),
-        ];
-        newCourses[courseIndex].showPrereqInput = false;
-        return { ...prev, courses: newCourses };
-      });
-      setCurrentPrereq('');
+  const removeSubject = (index) => {
+    if (subjects.length > 1) {
+      const updatedSubjects = subjects.filter((_, i) => i !== index);
+      setSubjects(updatedSubjects);
     }
   };
 
-  const removePrerequisite = (courseIndex, prereqIndex) => {
-    setFormData(prev => {
-      const newCourses = [...prev.courses];
-      newCourses[courseIndex].prerequisites = newCourses[courseIndex].prerequisites
-        .filter((_, i) => i !== prereqIndex);
-      return { ...prev, courses: newCourses };
-    });
-  };
-
-  const updateCourseField = (index, field, value) => {
-    setFormData(prev => {
-      const newCourses = [...prev.courses];
-      newCourses[index] = { ...newCourses[index], [field]: value };
-      return { ...prev, courses: newCourses };
-    });
-  };
-
-  const handleCreateRegistration = () => {
-    // Validation
-    if (!formData.deptCode || !formData.deptName || !formData.semesterNumber || 
-        !formData.registrationDeadline || !formData.startDate) {
-      Alert.alert('Validation Error', 'Please fill in all required fields');
-      return;
+  const validateSubject = (subject) => {
+    if (!subject.departmentId) throw new Error('Department is required');
+    if (!subject.semesterId) throw new Error('Semester is required');
+    if (!subject.courseId) throw new Error('Course is required');
+    if (subject.maxStudent !== null && isNaN(subject.maxStudent)) {
+      throw new Error('Max students must be a number');
     }
+  };
 
-    const hasInvalidCourses = formData.courses.some(course => 
-      !course.code || !course.name || !course.creditHours || !course.instructor || !course.maxStudents
+  const handleSubmit = async () => {
+    try {
+      for (const subject of subjects) {
+        validateSubject(subject);
+
+        const payload = {
+          departmentId: parseInt(subject.departmentId, 10),
+          semesterId: parseInt(subject.semesterId, 10),
+          courseId: subject.courseId,
+         
+          maxStudent: subject.maxStudent,
+          startDate: subject.startDate,
+          endDate: subject.endDate
+        };
+        console.log('Payload:', payload);
+
+        const response = await axios.post(
+          `${API_BASE_URL}/api/Registration/CreateAddRegistration`, 
+          payload,
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+        console.log('Registration successful:', response.data);
+      }
+
+      Alert.alert('Success', 'Registration completed successfully!');
+      navigation.goBack();
+    } catch (error) {
+      console.error('Registration error:', error.response?.data || error.message);
+      Alert.alert('Error', error.response?.data?.message || 'Failed to complete registration');
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6C63FF" />
+      </View>
     );
-
-    if (hasInvalidCourses) {
-      Alert.alert('Validation Error', 'Please fill in all required course details');
-      return;
-    }
-
-    // Prepare data to match SemesterDetailsScreen structure
-    const semesterDetails = [{
-      registrationDeadline: formData.registrationDeadline,
-      startDate: formData.startDate,
-      courses: formData.courses.map(course => ({
-        code: course.code,
-        name: course.name,
-        creditHours: parseInt(course.creditHours) || 0,
-        type: course.type,
-        instructor: course.instructor,
-        labInstructor: course.type === 'Theory + Lab' ? course.labInstructor : undefined,
-        maxStudents: parseInt(course.maxStudents) || 0,
-        prerequisites: course.prerequisites,
-      })),
-    }];
-
-    // Simulate API call and navigate back with data
-    Alert.alert(
-      'Success',
-      'Semester registration created successfully',
-      [{
-        text: 'OK',
-        onPress: () => navigation.navigate('SemesterDetailsScreen', {
-          deptCode: formData.deptCode,
-          deptName: formData.deptName,
-          semesterNumber: formData.semesterNumber,
-          semesterName: `${formData.semesterNumber}th Semester`, // Assuming ordinal naming
-          semesterDetails,
-        }),
-      }],
-    );
-  };
+  }
 
   return (
-    <View style={styles.CreateSemesterRegistrationmainContainer}>
+    <View style={styles.CreateSubjectsScreenmainContainer}>
       <Header />
       <CustomHeader
-        title="Semester Registration"
-        currentScreen="Add Registration"
+        title="Course Registration"
+        currentScreen="Semester Registration"
         showSearch={false}
         showRefresh={false}
         navigation={navigation}
       />
 
-      <View style={styles.CreateSemesterRegistrationcontentContainer}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.CreateSemesterRegistrationscrollContent}
-        >
-          <Text style={styles.CreateSemesterRegistrationformTitle}>Create Semester Registration</Text>
+      <View style={styles.CreateSubjectsScreencontentContainer}>
+        <ScrollView contentContainerStyle={styles.CreateSubjectsScreenscrollContent}>
+          <Text style={styles.CreateSubjectsScreenformTitle}>Semester Registration</Text>
 
-          <View style={styles.CreateSemesterRegistrationlegendContainer}>
-            <View style={styles.CreateSemesterRegistrationlegendItem}>
-              <View style={[styles.CreateSemesterRegistrationlegendDot, styles.CreateSemesterRegistrationrequiredDot]} />
-              <Text style={styles.CreateSemesterRegistrationlegendText}>Required*</Text>
-            </View>
-            <View style={styles.CreateSemesterRegistrationlegendItem}>
-              <View style={[styles.CreateSemesterRegistrationlegendDot, styles.CreateSemesterRegistrationoptionalDot]} />
-              <Text style={styles.CreateSemesterRegistrationlegendText}>Optional</Text>
-            </View>
-          </View>
+          {subjects.map((subject, index) => (
+            <SectionContainer key={index} sectionNumber={index+1} title={`Course ${index+1}`}>
+              <FormField
+                label="Department*"
+                placeholder="Select Department"
+                type="select"
+                value={subject.departmentId}
+                onChangeText={(value) => handleInputChange(index, 'departmentId', value)}
+                options={departments.map(dept => ({
+                  label: dept.departmentName,
+                  value: dept.id.toString()
+                }))}
+              />
 
-          <SectionContainer
-            title="Basic Information"
-            icon={<MaterialIcons name="info" size={24} color="#6C63FF" />}
+              <FormField
+                                label="Semester"
+                                placeholder="Select Semester"
+                                type="select"
+                                required
+                                value={subject.semesterId}
+                                onChangeText={(value) => handleInputChange(index, 'semesterId', value)}
+                                options={semesters.map((sem) => ({
+                                  label: sem.semesterName,
+                                  value: sem.id.toString(),
+                                }))}
+                              />
+              <FormField
+                label="Course*"
+                  placeholder="Select Course"
+                type="select"
+                value={subject.courseId}
+                onChangeText={(value) => handleInputChange(index, 'courseId', value)}
+                options={courses.map(course => ({
+                  label: course.name,
+                  value: course.id.toString()
+                }))}
+              />
+
+              <FormField
+                label="Max Students"
+                value={subject.maxStudent?.toString() || ''}
+                onChangeText={(value) => handleInputChange(index, 'maxStudent', value)}
+                placeholder="Enter maximum students"
+                keyboardType="numeric"
+              />
+              
+
+              <FormField
+                label="Start Date"
+                type="date"
+                value={subject.startDate}
+                onChangeText={(value) => handleInputChange(index, 'startDate', value)}
+              />
+
+              <FormField
+                label="End Date"
+                type="date"
+                value={subject.endDate}
+                onChangeText={(value) => handleInputChange(index, 'endDate', value)}
+              />
+
+              {subjects.length > 1 && (
+                <TouchableOpacity 
+                  style={styles.removeButton}
+                  onPress={() => removeSubject(index)}
+                >
+                  <Text style={styles.removeButtonText}>Remove Course</Text>
+                </TouchableOpacity>
+              )}
+            </SectionContainer>
+          ))}
+
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={addMoreSubjects}
           >
-            <FormField
-              label="Department Code"
-              value={formData.deptCode}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, deptCode: text }))}
-              placeholder="e.g., SE, CS"
-            />
-            <FormField
-              label="Department Name"
-              value={formData.deptName}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, deptName: text }))}
-              placeholder="e.g., Software Engineering"
-            />
-            <FormField
-              label="Semester Number"
-              value={formData.semesterNumber}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, semesterNumber: text }))}
-              placeholder="e.g., 5"
-              keyboardType="numeric"
-            />
-            <FormField
-              label="Registration Deadline"
-              value={formData.registrationDeadline}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, registrationDeadline: text }))}
-              placeholder="YYYY-MM-DD"
-            />
-            <FormField
-              label="Start Date"
-              value={formData.startDate}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, startDate: text }))}
-              placeholder="YYYY-MM-DD"
-            />
-          </SectionContainer>
-
-          <SectionContainer
-            title="Courses"
-            icon={<MaterialIcons name="book" size={24} color="#6C63FF" />}
-          >
-            {formData.courses.map((course, index) => (
-              <View key={index} style={styles.CreateSemesterRegistrationcourseContainer}>
-                <View style={styles.CreateSemesterRegistrationcourseHeader}>
-                  <Text style={styles.CreateSemesterRegistrationcourseTitle}>Course {index + 1}</Text>
-                  {index > 0 && (
-                    <TouchableOpacity
-                      onPress={() => removeCourse(index)}
-                      style={styles.CreateSemesterRegistrationremoveButton}
-                    >
-                      <MaterialIcons name="delete" size={24} color="#EF4444" />
-                    </TouchableOpacity>
-                  )}
-                </View>
-
-                <FormField
-                  label="Course Code"
-                  value={course.code}
-                  onChangeText={(text) => updateCourseField(index, 'code', text)}
-                  placeholder="e.g., SE501"
-                />
-                <FormField
-                  label="Course Name"
-                  value={course.name}
-                  onChangeText={(text) => updateCourseField(index, 'name', text)}
-                  placeholder="e.g., Software Design Patterns"
-                />
-                <FormField
-                  label="Credit Hours"
-                  value={course.creditHours}
-                  onChangeText={(text) => updateCourseField(index, 'creditHours', text)}
-                  placeholder="e.g., 3"
-                  keyboardType="numeric"
-                />
-
-                <View style={styles.CreateSemesterRegistrationinputGroup}>
-                  <Text style={styles.CreateSemesterRegistrationlabel}>Course Type</Text>
-                  <View style={styles.CreateSemesterRegistrationtypeContainer}>
-                    {['Theory', 'Theory + Lab'].map((type) => (
-                      <TouchableOpacity
-                        key={type}
-                        style={[
-                          styles.CreateSemesterRegistrationtypeButton,
-                          course.type === type && styles.CreateSemesterRegistrationtypeButtonActive,
-                        ]}
-                        onPress={() => updateCourseField(index, 'type', type)}
-                      >
-                        <Text style={[
-                          styles.CreateSemesterRegistrationtypeButtonText,
-                          course.type === type && styles.CreateSemesterRegistrationtypeButtonTextActive,
-                        ]}>
-                          {type}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                <FormField
-                  label="Instructor"
-                  value={course.instructor}
-                  onChangeText={(text) => updateCourseField(index, 'instructor', text)}
-                  placeholder="e.g., Dr. John Smith"
-                />
-
-                {course.type === 'Theory + Lab' && (
-                  <FormField
-                    label="Lab Instructor"
-                    value={course.labInstructor}
-                    onChangeText={(text) => updateCourseField(index, 'labInstructor', text)}
-                    placeholder="e.g., Mr. David Brown"
-                  />
-                )}
-
-                <FormField
-                  label="Max Students"
-                  value={course.maxStudents}
-                  onChangeText={(text) => updateCourseField(index, 'maxStudents', text)}
-                  placeholder="e.g., 50"
-                  keyboardType="numeric"
-                />
-
-                <View style={styles.CreateSemesterRegistrationinputGroup}>
-                  <Text style={styles.CreateSemesterRegistrationlabel}>Prerequisites</Text>
-                  <View style={styles.CreateSemesterRegistrationprerequisitesContainer}>
-                    {course.prerequisites.map((prereq, prereqIndex) => (
-                      <View key={prereqIndex} style={styles.CreateSemesterRegistrationprerequisiteTag}>
-                        <Text style={styles.CreateSemesterRegistrationprerequisiteText}>{prereq}</Text>
-                        <TouchableOpacity
-                          onPress={() => removePrerequisite(index, prereqIndex)}
-                          style={styles.CreateSemesterRegistrationremovePrereqButton}
-                        >
-                          <MaterialIcons name="close" size={16} color="#6B7280" />
-                        </TouchableOpacity>
-                      </View>
-                    ))}
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.CreateSemesterRegistrationaddPrereqButton}
-                    onPress={() => togglePrerequisiteInput(index)}
-                  >
-                    <MaterialIcons name="add" size={24} color="#6C63FF" />
-                    <Text style={styles.CreateSemesterRegistrationaddPrereqButtonText}>Add Prerequisite</Text>
-                  </TouchableOpacity>
-
-                  {course.showPrereqInput && (
-                    <View style={styles.CreateSemesterRegistrationaddPrereqContainer}>
-                      <FormField
-                        value={currentPrereq}
-                        onChangeText={setCurrentPrereq}
-                        placeholder="Enter prerequisite course code"
-                        containerStyle={styles.CreateSemesterRegistrationprereqInput}
-                      />
-                      <TouchableOpacity
-                        style={styles.CreateSemesterRegistrationaddPrereqButton}
-                        onPress={() => addPrerequisite(index)}
-                      >
-                        <MaterialIcons name="check" size={24} color="#6C63FF" />
-                      </TouchableOpacity>
-                    </View>
-                  )}
-                </View>
-              </View>
-            ))}
-
-            <TouchableOpacity
-              style={styles.CreateSemesterRegistrationaddCourseButton}
-              onPress={addCourse}
-            >
-              <MaterialIcons name="add" size={24} color="#6C63FF" />
-              <Text style={styles.CreateSemesterRegistrationaddCourseButtonText}>Add Another Course</Text>
-            </TouchableOpacity>
-          </SectionContainer>
+            <Text style={styles.addButtonText}>+ Add Another Course</Text>
+          </TouchableOpacity>
         </ScrollView>
 
         <View style={styles.CreateExamSchedulebuttonContainer}>
           <CustomButton
             buttons={[
-              {
-                title: 'Cancel',
-                onPress: () => navigation.goBack(),
-                variant: 'secondary',
-              },
-              {
-                title: 'Create Registration',
-                onPress: handleCreateRegistration,
-                variant: 'primary',
-              },
+              { title: "Cancel", onPress: () => navigation.goBack(), variant: "secondary" },
+              { title: "Register", onPress: handleSubmit, variant: "primary" },
             ]}
           />
         </View>
@@ -373,4 +232,4 @@ const CreateSemesterRegistration = ({ navigation }) => {
   );
 };
 
-export default CreateSemesterRegistration;
+export default SemesterRegistration;

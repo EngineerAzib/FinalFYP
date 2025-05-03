@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 import {
     View,
     Text,
@@ -7,23 +10,22 @@ import {
     StyleSheet,
     Image,
     Animated,
-    Dimensions,
     KeyboardAvoidingView,
     Platform,
     Alert,
     ActivityIndicator,
     ScrollView
-} from 'react-native';
+} from 'react-native';  
 import { MaterialIcons } from '@expo/vector-icons';
 
-import * as Crypto from 'expo-crypto';
+import { API_BASE_URL } from '../src/Services/Config'; 
+import { useAuth } from './AuthContext';
 
-// Secure password validation regex
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+const PASSWORD_REGEX = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const AuthScreen = ({ navigation }) => {
-    // State management
+    const { signIn } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [selectedRole, setSelectedRole] = useState(null);
     const [formData, setFormData] = useState({
@@ -31,21 +33,40 @@ export const AuthScreen = ({ navigation }) => {
         password: '',
         confirmPassword: '',
         fullName: '',
-        employeeId: '', // For teachers and admin
-        studentId: '', // For students
+        employeeId: '',
+        studentId: '',
         department: '',
     });
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Animation values
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const slideAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.95)).current;
     const hasAnimated = useRef(false);
-
-    // Role options with their respective icons and descriptions
+    const registerForPushNotificationsAsync = async () => {
+        if (!Device.isDevice) {
+          alert('Must use physical device for Push Notifications');
+          return;
+        }
+      
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        
+        if (finalStatus !== 'granted') {
+          alert('Failed to get push token for push notification!');
+          return;
+        }
+      
+        const token = (await Notifications.getExpoPushTokenAsync()).data;
+        return token;
+      };
     const roles = [
         {
             id: 'student',
@@ -73,7 +94,6 @@ export const AuthScreen = ({ navigation }) => {
         }
     ];
 
-    // Animation effects
     useEffect(() => {
         if (!hasAnimated.current) {
             hasAnimated.current = true;
@@ -98,22 +118,17 @@ export const AuthScreen = ({ navigation }) => {
         }
     }, []);
 
-
-    // Form validation
     const validateForm = async () => {
         const newErrors = {};
 
-        // Email validation
         if (!EMAIL_REGEX.test(formData.email)) {
             newErrors.email = 'Please enter a valid email address';
         }
 
-        // Password validation
         if (!PASSWORD_REGEX.test(formData.password)) {
             newErrors.password = 'Password must contain at least 8 characters, including uppercase, lowercase, number, and special character';
         }
 
-        // Additional signup validations
         if (!isLogin) {
             if (formData.password !== formData.confirmPassword) {
                 newErrors.confirmPassword = 'Passwords do not match';
@@ -140,70 +155,64 @@ export const AuthScreen = ({ navigation }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    // Handle form submission
     const handleSubmit = async () => {
         setIsLoading(true);
         try {
-            const isValid = await validateForm();
-            if (!isValid) {
-                setIsLoading(false);
-                return;
+            if (isLogin) {
+                // 1. Perform login
+                const response = await fetch(`${API_BASE_URL}/api/Account/Login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: formData.email.toLowerCase(),
+                        password: formData.password,
+                    }),
+                });
+    
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Login failed');
+                }
+    
+                const { token, userId } = await response.json(); // Only need userId
+                
+                // 2. Register for push notifications
+                const expoPushToken = await registerForPushNotificationsAsync();
+                
+                // 3. Send token to your backend
+                if (expoPushToken) {
+                    await fetch(`${API_BASE_URL}/api/devices`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ExpoPushToken: expoPushToken,
+                            StudentId: userId // Only sending what your controller expects
+                        }),
+                    });
+                }
+    
+                // 4. Complete login
+                await signIn(token, userId);
+                
+            } else {
+                // Registration logic
             }
-
-            // Hash password before sending to server
-            const hashedPassword = await Crypto.digestStringAsync(
-                Crypto.CryptoDigestAlgorithm.SHA256,
-                formData.password
-            );
-
-            // Prepare data for API call
-            const authData = {
-                email: formData.email.toLowerCase(),
-                password: hashedPassword,
-                role: selectedRole,
-                ...(isLogin ? {} : {
-                    fullName: formData.fullName,
-                    department: formData.department,
-                    ...(selectedRole === 'student'
-                        ? { studentId: formData.studentId }
-                        : { employeeId: formData.employeeId }
-                    )
-                })
-            };
-
-            // For development/testing, simulate API call
-            console.log('Auth Data:', authData);
-
-            // Temporary: Show alert instead of navigation
-            Alert.alert(
-                isLogin ? 'Login Successful' : 'Registration Successful',
-                `Welcome ${formData.email}!`,
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            // Only attempt navigation if we have the screens set up
-                            if (navigation?.navigate) {
-                                navigation.navigate(`${selectedRole}Dashboard`);
-                            }
-                        }
-                    }
-                ]
-            );
         } catch (error) {
-            Alert.alert('Error', 'Authentication failed. Please try again.');
+            Alert.alert('Error', error.message || 'Authentication failed');
         } finally {
             setIsLoading(false);
         }
     };
     const handleRoleSelection = (roleId) => {
-        // Fade out current content
         Animated.timing(fadeAnim, {
             toValue: 0.5,
             duration: 200,
             useNativeDriver: true
         }).start(() => {
-            // Update role and fade back in
             setSelectedRole(roleId);
             Animated.timing(fadeAnim, {
                 toValue: 1,
@@ -212,14 +221,13 @@ export const AuthScreen = ({ navigation }) => {
             }).start();
         });
     };
+
     const handleAuthToggle = () => {
-        // Fade out current content
         Animated.timing(fadeAnim, {
             toValue: 0.5,
             duration: 200,
             useNativeDriver: true
         }).start(() => {
-            // Reset form and toggle mode
             setIsLogin(!isLogin);
             setSelectedRole(null);
             setErrors({});
@@ -232,8 +240,6 @@ export const AuthScreen = ({ navigation }) => {
                 studentId: '',
                 department: '',
             });
-
-            // Fade back in
             Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 200,
@@ -271,7 +277,7 @@ export const AuthScreen = ({ navigation }) => {
                     {/* Logo and Header */}
                     <View style={styles.authHeader}>
                         <Image
-                            source={require('../Assets/logo.jpg')}
+                            source={require('../src/Assets/logo.jpg')}
                             style={styles.authLogo}
                         />
                         <Text style={styles.authTitle}>
@@ -368,7 +374,6 @@ export const AuthScreen = ({ navigation }) => {
                             )}
                         </View>
 
-                        {/* Additional Signup Fields */}
                         {!isLogin && (
                             <>
                                 <View style={styles.formGroup}>
@@ -456,7 +461,6 @@ export const AuthScreen = ({ navigation }) => {
                             </>
                         )}
 
-                        {/* Submit Button */}
                         <TouchableOpacity
                             style={[
                                 styles.submitButton,
@@ -474,8 +478,6 @@ export const AuthScreen = ({ navigation }) => {
                             )}
                         </TouchableOpacity>
 
-                        {/* Toggle Login/Signup */}
-                        {/* Toggle Login/Signup */}
                         <TouchableOpacity
                             style={styles.toggleAuthButton}
                             onPress={handleAuthToggle}
@@ -633,4 +635,3 @@ const styles = StyleSheet.create({
         fontWeight: '500'
     }
 });
-

@@ -136,10 +136,7 @@ const AdminProfile = ({ navigation }) => {
     { label: 'Phone', value: '+1 800 555 1234' },
     { label: 'Date Joined', value: 'Jan 1, 2022' }
   ];
-  const handleLogout = () => {
-    // Add any logout logic here (clear tokens, reset state, navigate to login screen)
-    navigation.navigate('AuthScreen');
-  };
+ 
 
   return (
     <View style={[styles.AdminProfilecontainer, { backgroundColor: '#F5F6FA' }]}>

@@ -9,6 +9,10 @@ export const SemesterListScreen = ({ navigation, route }) => {
   const { deptCode, deptName } = route.params;
 
   const semesters = {
+    1: "1th Semester",
+    2: "2th Semester",
+    3: "3th Semester",
+    4: "4th Semester",
     5: "5th Semester",
     6: "6th Semester",
     7: "7th Semester",
