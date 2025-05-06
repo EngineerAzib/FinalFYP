@@ -76,6 +76,8 @@ import StudentInternshipScreen from './Src_std/Screens/StudentInternshipScreen';
 import InternshipDetailScreen from './Src_std/Screens/InternshipDetailScreen';
 import InternshipApplicationScreen from './Src_std/Screens/InternshipApplicationScreen';
 import ApplicationSuccessScreen from './Src_std/Screens/ApplicationSuccessScreen';
+
+import { NotificationStudentScreen } from './Src_std/Screens/NotificationScreen';
 import EventsScreen from './Src_std/Screens/EventsScreen';
 import { navigationRef } from './src/Screens/RootNavigation'; 
 //Shared folder 
@@ -190,7 +192,7 @@ const StudentStack = () => (
     <Stack.Screen name="InternshipDetailScreen" component={InternshipDetailScreen} />
     <Stack.Screen name="InternshipApplicationScreen" component={InternshipApplicationScreen} />
     <Stack.Screen name="ApplicationSuccessScreen" component={ApplicationSuccessScreen} />
-
+    <Stack.Screen name="NotificationStudentScreen" component={NotificationStudentScreen} />
     <Stack.Screen name="EventsScreen" component={EventsScreen} />
 
     <Stack.Screen name="StudentAttendanceScreen" component={StudentAttendanceScreen} />

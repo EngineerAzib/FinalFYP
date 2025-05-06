@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-import Constants from 'expo-constants';
+import { RegisterForPushNotificationsAsync } from '../Src_std/StdServices/RegisterForPushNotificationsAsync';
 import {
     View,
     Text,
@@ -45,28 +43,7 @@ export const AuthScreen = ({ navigation }) => {
     const slideAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.95)).current;
     const hasAnimated = useRef(false);
-    const registerForPushNotificationsAsync = async () => {
-        if (!Device.isDevice) {
-          alert('Must use physical device for Push Notifications');
-          return;
-        }
-      
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-        
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-        
-        if (finalStatus !== 'granted') {
-          alert('Failed to get push token for push notification!');
-          return;
-        }
-      
-        const token = (await Notifications.getExpoPushTokenAsync()).data;
-        return token;
-      };
+   
     const roles = [
         {
             id: 'student',
@@ -154,59 +131,88 @@ export const AuthScreen = ({ navigation }) => {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-
     const handleSubmit = async () => {
         setIsLoading(true);
         try {
-            if (isLogin) {
-                // 1. Perform login
-                const response = await fetch(`${API_BASE_URL}/api/Account/Login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: formData.email.toLowerCase(),
-                        password: formData.password,
-                    }),
-                });
-    
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Login failed');
-                }
-    
-                const { token, userId } = await response.json(); // Only need userId
-                
-                // 2. Register for push notifications
-                const expoPushToken = await registerForPushNotificationsAsync();
-                
-                // 3. Send token to your backend
-                if (expoPushToken) {
-                    await fetch(`${API_BASE_URL}/api/devices`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            ExpoPushToken: expoPushToken,
-                            StudentId: userId // Only sending what your controller expects
-                        }),
-                    });
-                }
-    
-                // 4. Complete login
-                await signIn(token, userId);
-                
-            } else {
-                // Registration logic
+          // 1. Perform login request
+          const response = await fetch(`${API_BASE_URL}/api/Account/Login`, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({
+              email: formData.email.toLowerCase(),
+              password: formData.password,
+            }),
+          });
+      
+          // 2. Handle response errors
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Login failed. Please try again.');
+          }
+      
+          // 3. Parse successful response
+          const data = await response.json();
+          console.log('Login API Response:', data);
+      
+          // 4. Validate response structure
+          if (!data?.token || !data?.role) {
+            throw new Error('Server returned invalid response format');
+          }
+      
+          // 5. Parse JWT to get user ID
+          const parseJwt = (token) => {
+            try {
+              const base64Url = token.split('.')[1];
+              const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+              return JSON.parse(atob(base64));
+            } catch (e) {
+              throw new Error('Failed to parse authentication token');
             }
+          };
+      
+          const decodedToken = parseJwt(data.token);
+          const userId = decodedToken.sub; // Get user ID from JWT
+          console.log('Decoded user ID:', userId);
+      
+          // 6. Register for push notifications (if not already done)
+          let expoPushToken;
+          try {
+            expoPushToken = await RegisterForPushNotificationsAsync();
+            if (expoPushToken) {
+              console.log('Expo Push Token:', expoPushToken);
+              await registerDeviceWithBackend(data.token, userId, expoPushToken);
+            }
+          } catch (notificationError) {
+            console.warn('Push notification registration failed:', notificationError);
+            // Continue with login even if notifications fail
+          }
+      
+          // 7. Complete the login process
+          await signIn(data.token, data.role.toLowerCase());
+          
+          // 8. Navigate based on role
+          const roleRoutes = {
+            STUDENT: 'StudentDashboard',
+            TEACHER: 'TeacherDashboard',
+            ADMIN: 'AdminDashboard'
+          };
+          console.log(data.role);
+          if (roleRoutes[data.role]) {
+            navigation.navigate(roleRoutes[data.role]);
+          }
+      
         } catch (error) {
-            Alert.alert('Error', error.message || 'Authentication failed');
+          console.error('Login error:', error);
+          Alert.alert(
+            'Login Failed',
+            error.message || 'An error occurred during login'
+          );
         } finally {
-            setIsLoading(false);
+          setIsLoading(false);
         }
-    };
+      };
     const handleRoleSelection = (roleId) => {
         Animated.timing(fadeAnim, {
             toValue: 0.5,

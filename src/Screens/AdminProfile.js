@@ -1,18 +1,57 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Dimensions, View, ScrollView, TouchableOpacity, Text, Image, Animated, StatusBar } from 'react-native';
+import { StyleSheet, Dimensions, View, ScrollView, TouchableOpacity, Text, Image, Animated, StatusBar, Alert,ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import HeaderBackground from '../Components/HeaderBackground ';
 import styles from '../AdminPortal_Css';
 import axios from "axios";
-import { navigationRef } from './RootNavigation'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width } = Dimensions.get('window');
 import { API_BASE_URL } from '../Services/Config';
 import { useAuth } from '../../shared/AuthContext';
 
-// Enhanced AnimatedStatCard with light theme colors
+// Profile API Service (moved to the same file for clarity)
+const fetchProfile = async () => {
+  try {
+    console.log("Fetching profile...");
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) throw new Error('No token found');
+    
+    const cleanToken = token.replace(/['"]/g, '').trim();
+    console.log("Using Token:", cleanToken);
+
+    const response = await axios({
+      method: 'get',
+      url: `${API_BASE_URL}/api/Dashboard/GetProfileInfo`,
+      headers: {
+        'Authorization': `Bearer ${cleanToken}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000
+    });
+
+    console.log("API Response:", response.data);
+    return response.data;
+
+  } catch (error) {
+    console.error("API Error:", {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    
+    if (error.response?.status === 401) {
+      await AsyncStorage.removeItem('userToken');
+      Alert.alert("Session Expired", "Your session has expired. Please login again");
+    }
+    
+    throw error;
+  }
+};
+
+// AnimatedStatCard component remains the same
 const AnimatedStatCard = ({ title, value, icon, color, index }) => {
   const scaleAnim = useRef(new Animated.Value(0)).current;
 
@@ -39,7 +78,7 @@ const AnimatedStatCard = ({ title, value, icon, color, index }) => {
   );
 };
 
-// Enhanced ProfileSection with logout button
+// ProfileSection component remains the same
 const ProfileSection = ({ scrollY, navigation }) => {
   const imageScale = scrollY.interpolate({
     inputRange: [0, 100],
@@ -53,11 +92,8 @@ const ProfileSection = ({ scrollY, navigation }) => {
     extrapolate: 'clamp'
   });
 
-
   return (
     <Animated.View style={[styles.AdminProfileprofileContainer, { opacity: headerOpacity }]}>
-
-
       <Animated.View style={[styles.AdminProfileavatarContainer, { transform: [{ scale: imageScale }] }]}>
         <Image source={require('../Assets/profileicon.png')} style={styles.AdminProfileavatar} />
         <View style={[styles.AdminProfilebadgeContainer, { backgroundColor: '#FFFFFF' }]}>
@@ -69,7 +105,7 @@ const ProfileSection = ({ scrollY, navigation }) => {
   );
 };
 
-// Enhanced DetailSection with light theme
+// DetailSection component remains the same
 const DetailSection = ({ title, icon, children, isExpanded, onToggle }) => {
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const contentHeight = useRef(new Animated.Value(0)).current;
@@ -124,6 +160,9 @@ const DetailSection = ({ title, icon, children, isExpanded, onToggle }) => {
 };
 
 const AdminProfile = ({ navigation }) => {
+  const [personalInfo, setPersonalInfo] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { signOut } = useAuth();
   const scrollY = useRef(new Animated.Value(0)).current;
   const [expandedSection, setExpandedSection] = useState(null);
@@ -134,15 +173,34 @@ const AdminProfile = ({ navigation }) => {
     { title: 'Total Applications', value: '85', icon: 'event-note', color: '#6C63FF' }
   ];
 
-  const personalInfo = [
-    { label: 'Admin ID', value: 'ADMIN-00123' },
-    { label: 'Email', value: 'admin@application.com' },
-    { label: 'Phone', value: '+1 800 555 1234' },
-    { label: 'Date Joined', value: 'Jan 1, 2022' }
-  ];
-  // const handleLogout=()=>{
-  //   navigation.navigate('AuthScreen');
-  // }
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchProfile();
+      console.log("API Data:", data);
+      
+      // Transform API response to match your UI structure
+      const formattedData = [
+        { label: 'Admin ID', value: data.adminID || 'N/A' },
+        { label: 'Email', value: data.email || 'N/A' },
+        { label: 'Phone', value: data.phone || 'N/A' }
+      ];
+      
+      setPersonalInfo(formattedData);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError(err.message || 'Failed to load profile data');
+      Alert.alert("Error", "Failed to load profile information");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handleLogout = async () => {
     try {
       const token = await AsyncStorage.getItem('userToken');
@@ -156,11 +214,10 @@ const AdminProfile = ({ navigation }) => {
     } finally {
       try {
         await AsyncStorage.multiRemove(['userToken', 'userRole']);
-        await signOut(); 
-
-      
+        await signOut();
+        navigation.navigate('AuthScreen');
       } catch (err) {
-        console.error('Error clearing storage or navigating:', err);
+        console.error('Error clearing storage:', err);
       }
     }
   };
@@ -168,6 +225,21 @@ const AdminProfile = ({ navigation }) => {
   return (
     <View style={[styles.AdminProfilecontainer, { backgroundColor: '#F5F6FA' }]}>
       <StatusBar barStyle="dark-content" />
+
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6C63FF" />
+        </View>
+      )}
+
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity onPress={fetchData}>
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <Animated.ScrollView
         onScroll={Animated.event(
@@ -191,7 +263,6 @@ const AdminProfile = ({ navigation }) => {
         </View>
 
         <View style={styles.AdminProfiledetailsContainer}>
-          {/* Personal Information Section */}
           <DetailSection
             title="Personal Information"
             icon="person"
@@ -210,7 +281,6 @@ const AdminProfile = ({ navigation }) => {
             ))}
           </DetailSection>
 
-          {/* New Account Settings Section with Logout */}
           <DetailSection
             title="Account Settings"
             icon="settings"
@@ -235,5 +305,5 @@ const AdminProfile = ({ navigation }) => {
     </View>
   );
 };
-export default AdminProfile;
 
+export default AdminProfile;
